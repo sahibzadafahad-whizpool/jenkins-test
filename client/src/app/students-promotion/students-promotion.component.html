@@ -1,0 +1,206 @@
+<div class="row">
+    <div class="col-lg-12 col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Students Promotion</h4>
+
+                <div style="font-size: .75rem;">
+                    <span>
+            <b> Student Promotion Note : </b>
+            Promoting student from the present class to the next class will create an enrollment of
+            that student to the next session. Make sure to select correct class options from the select
+            menu before promoting.If you don't want to promote a student to the next class, please select
+            same class from option. That will not promote the student to the next class but it will create an enrollment
+            to the next session but in the same class.
+          </span>
+                </div>
+                <form class="form-group" #studentPromote="ngForm" (ngSubmit)="listStudentsForPromotion(studentPromote)">
+                    <div class="row" style="margin-top:1em;">
+                        <div class="col-md-6 form-group">
+                            <label class="control-label" style="margin-top:1em;">Current Session </label>
+                            <input type="text" style="margin-top:0em;" [(ngModel)]="current_session" readonly class="form-control fm-control" name="current_session">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="control-label" style="margin-top:1em;">Next Session <small style="color: brown">
+                  (If Next Session is empty than add next session from Settings )</small></label>
+
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickednextSession.valid && pickednextSession.touched"><small>
+                  Required</small></span>
+                            <select class="form-control fm-control" required style="margin-top:0em;" #pickednextSession [(ngModel)]="next_session" name="next_session">
+                <option [ngValue]="undefined" disabled>Select Next Session</option>
+                <option *ngFor="let item of sessionList" [value]="item.session_name">{{item.session_name}}</option>
+              </select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label"> Promotion From Class *</label>
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdCLass.valid && pickedStdCLass.touched"><small>Class
+                  Required</small></span>
+                            <select class="form-control fm-control" required style="margin-top:0em;" #pickedStdCLass [(ngModel)]="class_id" name="class_id">
+                <option [ngValue]="undefined" disabled>Select Class</option>
+                <option *ngFor="let item of classList" [value]="item.class_id">{{item.class_name}}</option>
+              </select>
+
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <label class="control-label"> Promotion To Class *</label>
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdPBCLass.valid && pickedStdPBCLass.touched"><small>Class
+                  Required</small></span>
+                            <select class="form-control fm-control" (change)=classSelected(pickedStdPBCLass.value); required style="margin-top:0em;" #pickedStdPBCLass [(ngModel)]="promoted_class_id" name="promotedB_class_id">
+                <option [ngValue]="undefined" disabled>Select Class</option>
+                <option *ngFor="let item of classList" [value]="item.class_id">{{item.class_name}}</option>
+              </select>
+
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label class="control-label"> Promotion To Section *</label>
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdBPSection.valid && pickedStdBPSection.touched"><small>Section
+                  Required</small></span>
+                            <select class="form-control fm-control" (change)=enableBtn() required style="margin-top:0em;" #pickedStdBPSection [(ngModel)]="promoted_section_id" name="promotedB_section_id">
+                <option [ngValue]="undefined" disabled>Select Section</option>
+                <option *ngFor="let item of sectionsDataList" [value]="item.section_id">{{item.section_name}}</option>
+              </select>
+
+                        </div>
+
+                        <div class="col-md-12 col-md-offset-12 form-group" style="text-align:center; margin-top:2.5em;">
+                            <input type="submit" class="btn btn-info" style="margin-top:1em" [disabled]="!studentPromote.form.valid || disableBtn " value="Manage Promotions">
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row" *ngIf="showTable">
+    <div class="col-lg-12 col-md-12">
+        <div class="card">
+            <div class="card-body">
+
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+
+                            <th>S.no</th>
+                            <th>Roll Number</th>
+                            <th>Name</th>
+
+                            <th>Current Class</th>
+                            <th>Section</th>
+                            <!-- <th>Student Info</th> -->
+                            <th>
+                                <input type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll();" /> Select All</th>
+                            <!-- <th>Promote Individually </th> -->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of studentPromotionData | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+                            <td>{{index + 1}}</td>
+                            <td>{{item.roll_num}}</td>
+                            <td>{{item.std_name}}</td>
+
+                            <td>{{item.class_name}}</td>
+                            <td>{{item.section_name}}</td>
+                            <td>
+                                <input type="checkbox" [(ngModel)]="item.promotion" (change)="checkIfAllSelected();">
+                            </td>
+                            <!-- <td> <span class="label label-darkblue" style="cursor: pointer;" (click)=viewStdResult(item.student_id)>View -->
+                            <!-- Result</span></td> -->
+
+                            <!-- <td>
+
+                                <label class="badge badge-info" style="cursor: pointer;" (click)=openStdPromotionModal(stdPromotionModal,item.student_id,index,item.roll_num)>Manage
+                  Promotion Individually</label>
+
+                            </td> -->
+                        </tr>
+
+                    </tbody>
+                </table>
+                <div class="row" style="margin-top:1.5em;">
+                    <div class="col-lg-12" style="text-align: center" *ngIf="promote_all_btn">
+                        <span style="cursor: pointer; margin-left: 1em; font-size: 13px;" class="btn btn-info" (click)="promote_all()">Promote All Selected Students</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- *********************************** Modals **************************************** -->
+
+    <!-- modal for manage student promotion -->
+
+    <ng-template #stdPromotionModal let-modal>
+        <div class="modal-header">
+            <div style="text-align: center">
+                <h3>Student Promotion</h3>
+            </div>
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+        </div>
+        <div class="modal-body">
+            <form class="form-group" #managePromotion="ngForm" (ngSubmit)="onSubmitPromoteStudent(managePromotion)">
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:.5em;">Current Session</label>
+                        <input type="text" readonly style="margin-top:0em;" class="form-control fm-control" name="current_session" [(ngModel)]="current_session">
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:.5em;"> Current Class </label>
+                        <input type="email" readonly style="margin-top:0em;" class="form-control fm-control" name="currentClass" [(ngModel)]="currentClass">
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:.5em;"> Current Section </label>
+                        <input type="email" readonly style="margin-top:0em;" class="form-control fm-control" name="currentSection" [(ngModel)]="currentSection">
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        <label class="control-label"> Promoted To Session </label>
+                        <input type="email" readonly style="margin-top:0em;" class="form-control fm-control" name="nextSession" [(ngModel)]="nextSession">
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        <label class="control-label"> Promotion To Class *</label>
+                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdPCLass.valid && pickedStdPCLass.touched"><small>Class
+                Required</small></span>
+                        <select class="form-control fm-control" (change)=classSelected(pickedStdPCLass.value); required style="margin-top:0em;" #pickedStdPCLass [(ngModel)]="promoted_class_id" name="promoted_class_id">
+              <option [ngValue]="undefined" disabled>Select Class</option>
+              <option *ngFor="let item of classList" [value]="item.class_id">{{item.class_name}}</option>
+            </select>
+
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label"> Promotion To Section *</label>
+                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdPSection.valid && pickedStdPSection.touched"><small>Section
+                Required</small></span>
+                        <select class="form-control fm-control" (change)=enableBtn() required style="margin-top:0em;" #pickedStdPSection [(ngModel)]="promoted_section_id" name="promoted_section_id">
+              <option [ngValue]="undefined" disabled>Select Section</option>
+              <option *ngFor="let item of sectionsDataList" [value]="item.section_id">{{item.section_name}}
+              </option>
+            </select>
+
+                    </div>
+                    <input type="hidden" readonly style="margin-top:0em;" class="form-control fm-control" name="p_student_id" [(ngModel)]="p_student_id">
+
+
+
+                    <div class="col-md-12 form-group modal_button" style="text-align: right;">
+                        <input type="submit" class="btn btn-info" style="margin-top:1em" [disabled]="!managePromotion.form.valid || disableBtn " value="Promote Student">
+
+                    </div>
+                </div>
+            </form>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </ng-template>

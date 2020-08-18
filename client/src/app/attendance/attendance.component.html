@@ -1,0 +1,188 @@
+<div class="row">
+    <div class="col-lg-12 ">
+        <div class="card">
+            <div class="card-body pb-0">
+                <h4 class="card-title">Manage Daily Attendance</h4>
+                <form style="margin-top:2em;" #manageAttedance="ngForm" (ngSubmit)="onSubmitMngAtten(manageAttedance)">
+                    <div class="row">
+                        <div class="col-md-3 form-group">
+                            <label class="control-label"> Class *</label>
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdCLass.valid && pickedStdCLass.touched"><small>Class
+                  Required</small></span>
+                            <select class="form-control fm-control" style="margin-top:0em;" #pickedStdCLass [(ngModel)]="std_classId" (change)=classSelected(pickedStdCLass.value); name="std_classId">
+                <option [ngValue]="undefined" disabled>Select Class</option>
+                <option *ngFor="let item of classDataList" [value]="item.class_id">{{item.class_name}}</option>
+              </select>
+
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            <label class="control-label"> Section *</label>
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdSection.valid && pickedStdSection.touched"><small>Section
+                  Required</small></span>
+                            <select class="form-control fm-control" style="margin-top:0em;" #pickedStdSection [(ngModel)]="std_sectionId" (change)=enableBtn() name="std_sectionId">
+                <option [ngValue]="undefined" [disabled] = "disableSelectSection" >Select Section</option>
+                <option *ngFor="let item of sectionsDataList" [value]="item.section_id">{{item.section_name}}</option>
+              </select>
+
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            <label class="control-label" style="margin-top:0em;"> Date (dd/mm/yyyy) </label>
+                            <span style="color:red; margin-left: 1em;" *ngIf="!pickedattendancedate.valid && pickedattendancedate.touched"><small>Date
+                  for Attendance required</small></span>
+
+                            <input [attr.max]="attendance_max_date" type="date" style="margin-top:0em;" class="form-control fm-control" name="attendance_date" required [(ngModel)]="attendance_date" #pickedattendancedate="ngModel">
+                        </div>
+
+                        <div class="col-md-3 form-group">
+                            <label class="control-label d-block">&nbsp;</label>
+                            <input type="submit" class="btn btn-info" style="font-size: 15px;width:195px;height:35px;padding-top: 9px;" [disabled]="!manageAttedance.form.valid || disableBtn" value="Manage Attendence">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- <h4 class="card-title">Assignments Information</h4> -->
+                <!-- <div class="mini-heading" style="text-align: center ; margin-top :-2.5em ; margin-bottom:2em;">
+                    <h3> Manage Attendance For</h3>
+                    <h4>
+                        Class : {{selectedClass}}
+                    </h4>
+                    <h4> Section : {{selectedSection}}
+                    </h4>
+                    <h4> Date : {{selectedDate}}</h4>
+                </div>
+                <hr> -->
+                <!-- <div style="height: 60px">
+           <alert *ngIf="attendanceNotifiction" type="success">{{ markAttendRespMsg}}</alert>
+        </div> -->
+
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th> S.No</th>
+                            <th>Roll Num</th>
+                            <th>Student Name</th>
+                            <th>Father Name</th>
+                            <!-- <th>Class </th>
+              <th>Section</th> -->
+
+                            <th><input [disabled]="!this.studentsDataList" type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll();" /> &nbsp;Attendance Status : {{selectedDate}}</th>
+                            <th> Late arrival </th>
+                            <!-- <th>Mark Individually</th> -->
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of studentsDataList | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+
+                            <td>{{index + 1}}</td>
+                            <td>{{item.roll_num}}</td>
+                            <td>{{item.std_name}}</td>
+                            <td>{{item.parent_name}}</td>
+                            <!-- <td>{{item.class_name}}</td>
+
+
+              <td>{{item.section_name}}</td> -->
+
+                            <td [style.color]="item.attend_status == true ? 'green' : (item.attend_status == false ? 'red' : ( item.attend_status == 'P' ? 'green' : (  item.attend_status == 'A' ? 'red' : 'black' )))">
+                                <input type="checkbox" [(ngModel)]="item.attend_status" (change)="checkIfAllSelected();">
+                                &nbsp;
+                                <strong>
+                  {{item.attend_status == true ? "Present" : (item.attend_status == false ? "Absent" : ( item.attend_status == "P" ? "Present" : (  item.attend_status == "A" ? "Absent" : "Not Marked" ) ))}}
+                </strong>
+                            </td>
+                            <td>
+                                <span [hidden]="item.attend_status=='A' || item.attend_status==false || item.attend_status==null"><input [(ngModel)]="item.late_arrival" type="checkbox" (change)="late_arrival_changed($event,index)">
+                                &nbsp;Late arrived</span>
+                            </td>
+
+
+                            <!-- <td>
+                <label *ngIf="item.attend_status == 'A' || item.attend_status == false || item.attend_status == null "
+                  style="cursor: pointer;  margin-left: 1em; " class="badge badge-primary"
+                  (click)="markAttendance(item.class_id,item.section_id,item.std_id,'P')">Present</label>
+
+                <label *ngIf="item.attend_status == 'A' || item.attend_status == false "
+                  style="cursor: pointer; margin-left: 1em; " class="badge badge-warning"
+                  (click)="addLeave_Application(addLeaveReasonModel,item.std_name,item.attendance_id , item.comment)">Update
+                  Leave
+                  Reason</label>
+
+                <label *ngIf="item.attend_status == 'P' || item.attend_status == true || item.attend_status == null "
+                  style="cursor: pointer; margin-left: 1em;" class="badge badge-danger"
+                  (click)="markAttendance(item.class_id,item.section_id,item.std_id,'A')">Absent</label>
+
+              </td> -->
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="row" style="margin-top: 2em;">
+                    <div class="col-lg-12" style="text-align: center" *ngIf="mark_all_btn">
+                        <label style="cursor: pointer;margin-left: 1em;font-size: 15px;width:195px;height:35px;padding-top: 9px;" class="badge badge-info" (click)="MarkAll()">Save
+              Attendance</label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<!-- *********************************** Modals **************************************** -->
+
+
+
+<ng-template #addLeaveReasonModel let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Add Absent Reason</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <form class="form-group" #addStdLeave="ngForm" (ngSubmit)="add_std_leaveReason(addStdLeave)">
+            <label class="control-label"> Student Name </label>
+
+            <input type="text" readonly class="form-control fm-control" name="c_student_name" [(ngModel)]="c_student_name" #pickedExpTitle="ngModel">
+
+            <input type="hidden" name="attendance_id" [(ngModel)]="attendance_id">
+
+
+            <label class="control-label"> Absent Reason *</label>
+
+            <textarea rows="4" cols="50" required class="form-control fm-control" name="absent_reason" [(ngModel)]="absent_reason" #pickedExpDesc="ngModel"> </textarea>
+            <p class="alert alert-danger" *ngIf="!pickedExpDesc.valid && pickedExpDesc.touched" style="margin-top:1em; margin-left:0em;">
+                Reason Required!
+            </p>
+
+
+            <div class="modal_button" style="text-align:right">
+                <input type="submit" class="btn btn-info" [disabled]="!addStdLeave.form.valid" value="Add" style="margin-top: 1em;">
+            </div>
+
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

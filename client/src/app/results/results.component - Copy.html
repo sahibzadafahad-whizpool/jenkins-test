@@ -1,0 +1,236 @@
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Result Card</h4>
+
+                <ngb-tabset class="tab-solid tab-solid-primary">
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            <i class="mdi mdi-home-outline"></i>Exam Results
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <div class="row">
+                                <div class="col-lg-12 ">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Exam Result Card</h4>
+                                            <form style="margin-top:2em;" class="form-group" #showResultSummary="ngForm" (ngSubmit)="onSubmitShowResultSummary(showResultSummary)">
+                                                <div class="row">
+
+                                                    <div class="col-md-3 form-group">
+                                                        <label class="control-label"> Session *</label>
+                                                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedSession.valid && pickedSession.touched"><small>Exam
+                                                          Required</small></span>
+                                                        <select class="form-control fm-control" required style="margin-top:0em;" #pickedSession [(ngModel)]="session" (change)=submitSession(pickedSession.value) name="session">
+                                                          <option [ngValue]="undefined" disabled>Select Session</option>
+                                                          <option *ngFor="let item of sessionData" [value]="item.session_name">{{item.session_name}}
+                                                          </option>
+                                                      </select>
+
+                                                    </div>
+
+                                                    <!-- <div class="col-md-3 form-group">
+                                                        <label class="control-label"> Exam *</label>
+                                                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedExam.valid && pickedExam.touched"><small>Exam
+                                                          Required</small></span>
+                                                        <select class="form-control fm-control" required style="margin-top:0em;" #pickedExam [(ngModel)]="exam" (change)=submitExamIdF(pickedExam.value) name="exam">
+                                                          <option [ngValue]="undefined" disabled>Select Exam</option>
+                                                          <option *ngFor="let item of examsDataList" [value]="item.exam_id">{{item.exam_name}}
+                                                          </option>
+                                                      </select>
+
+                                                    </div> -->
+                                                    <div class="col-md-2 form-group">
+                                                        <label class="control-label"> Class *</label>
+                                                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedCLass.valid && pickedCLass.touched"><small>Class
+                                                            Required</small></span>
+                                                        <select class="form-control fm-control" style="margin-top:0em;" #pickedCLass [(ngModel)]="classid" (change)=classSelected(pickedCLass.value); name="classid">
+                                                          <option [ngValue]="undefined" disabled>Select Class</option>
+                                                          <option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}
+                                                          </option>
+                                                      </select>
+
+                                                    </div>
+
+                                                    <div class="col-md-2 form-group">
+                                                        <label class="control-label"> Section *</label>
+                                                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedSection.valid && pickedSection.touched"><small>Section
+                                                              Required</small></span>
+                                                        <select class="form-control fm-control" style="margin-top:0em;" #pickedSection [(ngModel)]="section" (change)="enableBtn()" name="section">
+                                                          <option [ngValue]="undefined" disabled>Select Section</option>
+                                                          <option *ngFor="let item of sectionsList" [value]="item.section_id">{{item.section_name}}
+                                                          </option>
+                                                      </select>
+
+                                                    </div>
+
+                                                    <div class="col-md-2 form-group" style="text-align: center ; ">
+                                                        <input type="submit" class="btn btn-info" style="margin-top:2.2em" [disabled]="!showResultSummary.form.valid || disableBtn" value="Show">
+
+                                                    </div>
+
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row" *ngIf="showtable">
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="card">
+                                        <div class="card-body" id="result_summary">
+                                            <div style="margin-top: -3em; text-align: center; margin-bottom: 3em;" class="mini-heading">
+                                                <h3>Result Summary</h3>
+
+                                            </div>
+                                            <hr>
+
+                                            <div class="hide_on_print" class="row" style="margin-top: 1em; margin-bottom: 0em; padding-bottom: 1.5em; padding-top: 0em;">
+                                                <div class="col-lg-4">
+                                                    <input class="form-control fm-control hide_on_print" [(ngModel)]="searchText" placeholder="Roll Num / Student Name">
+                                                </div>
+
+                                            </div>
+
+                                            <table class="table table-bordered table-hover">
+                                                <thead class="thead-light">
+                                                    <tr *ngIf="grading_type == 2">
+                                                        <th>S.No</th>
+                                                        <th>Roll Num</th>
+                                                        <th>Name </th>
+                                                        <th>Total Subjects</th>
+
+                                                        <th>Grade</th>
+                                                        <th>Result</th>
+
+                                                    </tr>
+                                                    <!-- <tr *ngIf="grading_type == 1">
+                                                        <th>S.No</th>
+                                                        <th>Roll Num</th>
+                                                        <th>Name </th>
+                                                        <th>Total Subjects</th>
+                                                        <th>Total Marks</th>
+                                                        <th>Obtained Marks</th>
+                                                        <th>Grade</th>
+                                                        <th class="hide_on_print">Result</th>
+
+                                                    </tr> -->
+                                                </thead>
+
+                                                <tbody>
+                                                    <tr *ngFor="let item of resultSummary | filter : searchText let index = index">
+
+                                                        <td>{{index + 1}}</td>
+                                                        <td>{{item.roll_num}}</td>
+                                                        <td>{{item.std_name}}</td>
+                                                        <!-- <td>{{ item.result_summary.length }}</td>
+                                                        <td *ngIf='grading_type == 1'>{{ item.total_marks }}</td>
+                                                        <td *ngIf="grading_type == 1">{{ item.obtained_marks }}</td>
+                                                        <td *ngIf="grading_type == 1">{{ item.obtained_marks / item.total_marks | percent: '2.0-2' }}</td>
+                                                        <td *ngIf="grading_type == 2"> Suppose A ;)</td> -->
+                                                        <td class="hide_on_print">
+                                                            <label class="badge badge-info" (click)="selectedStudentResult(index , showResultDetails)" style="cursor: pointer;">Result Details</label>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+                                        <div *ngIf="printButton" style="margin-left: 2.3em;">
+                                            <button class="btn btn-info" styleSheetFile="assets/print.css" [useExistingCss]="true" printSectionId="result_summary" ngxPrint>print</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-template>
+                    </ngb-tab>
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            <i class="mdi mdi-account-outline"></i>Quiz Results
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <div class="row">
+
+                            </div>
+
+                        </ng-template>
+                    </ngb-tab>
+
+                </ngb-tabset>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+<ng-template #showResultDetails let-modal>
+    <div class="modal-header">
+        <div style="text-align: center" class="col-lg-12">
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            <h3>Student Result Details</h3>
+
+        </div>
+
+    </div>
+
+    <div class="modal-body">
+
+        <div class="row" id="result_card">
+            <div class="col-lg-12" style="text-align:center">
+                <h4><u> Academic Result Card</u> </h4>
+
+            </div>
+            <div class="col-lg-4">
+                <h5> Student Roll No : <small style="font-size: medium;"> {{ SingleStudentresult.roll_num }} </small> </h5>
+                <h5> Student Name : <small style="font-size: medium;">  {{ SingleStudentresult.std_name }} </small></h5>
+                <h5> Student Father Name : <small style="font-size: medium;"> Nauman </small> </h5>
+
+            </div>
+            <div class="col-lg-4">
+
+            </div>
+            <div class="col-lg-4">
+
+            </div>
+            <div class="col-lg-12 col-md-12 form-group" style="margin-top:2em;">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <th> Subject</th>
+                        <th>Total Marks</th>
+                        <th>Obtained Marks</th>
+                        <th>Percentage</th>
+
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of SingleStudentresult.result_summary">
+                            <td>{{ item.subject_name }}</td>
+                            <td>{{ item.total_marks == '' ? 0 : item.total_marks }}</td>
+                            <td>{{ item.obtained_marks == '' ? 0 : item.obtained_marks }}</td>
+                            <td *ngIf="item.obtained_marks != '' && item.total_marks != '' ">{{ item.obtained_marks / item.total_marks | percent: '2.0-2' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer ">
+
+        <button class="btn btn-info" styleSheetFile="assets/print.css" [useExistingCss]="true" printSectionId="result_card" ngxPrint>print</button>
+        <button type="button " class="btn btn-light " (click)="modal.close( 'Close click') ">Close</button>
+    </div>
+
+
+</ng-template>

@@ -1,0 +1,1 @@
+this folder is used in server for fee templates

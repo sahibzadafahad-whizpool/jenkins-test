@@ -1,0 +1,183 @@
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">		
+		<div class="row">
+			<div class="col-lg-12">
+					<h4 class="card-title text-center">Manage Scholarship/Discounts {{selectedClass}}</h4>
+				</div>
+			<div style="text-align: center">
+			  <h5 style="color: red;"> {{dbRespMsg}}</h5>
+			</div>
+			<div class="col-md-12" style="background:#a7eaf5;text-center">
+				<form style="margin-top:2em;" class="form-group" #listFeeDiscounts="ngForm"
+				(ngSubmit)="onSubmitListClassStudents(listFeeDiscounts)">
+
+				<div class="row">
+					<div class="col-md-1 form-group" style="text-align: center"></div>
+					<div class="col-md-4 form-group">
+					  <label class="control-label"> <b>Class *</b></label>
+					  <span style="color:red; margin-left: 1em;" *ngIf="!pickedCLass.valid && pickedCLass.touched"><small>Class Required</small></span>
+					  <select class="form-control fm-control" required style="margin-top:0em;" #pickedCLass
+						[(ngModel)]="classid" name="classid" (change)=classSelected(pickedCLass.value);>
+						<option [ngValue]="undefined" disabled>Select Class</option>
+						<option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}</option>
+					  </select>
+
+					</div>
+					<div class="col-md-4 form-group">
+						<p *ngIf="!selectSection.valid && selectSection.touched " class="alert alert-danger " style="margin-top:1em; margin-left:0em; ">
+								Section is required!
+							</p>
+							<label class="control-label "><b>Section *</b></label>
+							<select class="form-control fm-control"  #selectSection="ngModel" required style="margin-top:0em;" [(ngModel)]="section_id"
+								#selectedSection  name="section_id" >
+								<option [ngValue]="undefined" disabled>Select Section</option>
+								<option *ngFor="let item of sectionsDataList" [value]="item.section_id">{{item.section_name}}</option>
+							</select>
+					</div>
+								
+					<div class="col-md-2 form-group" style="text-align: center">
+					   <label class="control-label "> &nbsp; &nbsp; </label><br/>	
+					  <input type="submit" class="btn btn-info"  [disabled]="!listFeeDiscounts.form.valid " value="List Students">
+					</div>
+				</div>
+			  </form>
+
+			</div>
+        </div>
+
+        <div class="col-lg-12 col-md-12" style="text-align:center;">
+        <span style="color:red; margin-left: 1em;">{{ dbrespStdFeeDisList }}</span>
+         </div>
+
+        <div class="col-lg-12 col-md-12" *ngIf="showtable">
+
+          <div style="text-align: center; margin-top: 2em;" >
+            <h4> Scholarship/Discounts List </h4>
+
+
+          </div>
+          <hr>
+          <div class="row" style="margin-top: 1em; margin-bottom: 0em; padding-bottom: 1.5em; padding-top: 0em;">
+            <div class="col-lg-4">
+              <input class="form-control fm-control" [(ngModel)]="searchText" placeholder="Roll Num / Student Name">
+            </div>
+
+
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="thead-light">
+                <tr>
+                  <th>S.No</th>
+                  <th>Roll Num</th>
+                  <th>Name </th>
+                  <th>Father Name</th>
+                  <!--<th>Section</th>-->
+				  <th>Tution Fee </th>
+				  <th>Discount</th>
+				  <th>Paid Tution Fee</th>
+				  <th>Comment</th>
+                  <th *ngIf="(admin_level == 1)">Actions</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of studentsDataList | filter : searchText let index = index">
+                  <td>{{index + 1}}</td>
+                  <td>{{item.roll_num}}</td>
+                  <td>{{item.std_name}}</td>
+                  <td>{{item.parent_name}}</td> 
+                  <!--<td>{{item.section_name}}</td>-->
+                  
+				  <td>
+					<div *ngIf="item.sub_class_id > 0; else elseBlock">{{classTutionFee[item.sub_class_id]}}</div>
+					<ng-template #elseBlock>{{classTutionFee[0]}}</ng-template>
+				  </td>
+                 
+                  <td>{{item.discount_amount}}%</td>               
+                  <td>{{(item.discount_amount) ? ((item.sub_class_id) ? classTutionFee[item.sub_class_id]-((item.discount_amount*classTutionFee[item.sub_class_id])/100) : classTutionFee[0]-((item.discount_amount*classTutionFee[0])/100)) : ""  }}</td> 
+				  <td width="100px" >
+					<div *ngIf="item.discount_comment.length <= 20; else elseCommentBlock">{{item.discount_comment}}</div>
+					<ng-template #elseCommentBlock>					
+					{{text_truncate(item.discount_comment,20)}}
+					<span placement="top" ngbTooltip={{item.discount_comment}} style='cursor:pointer'><b>View All</b></span>
+					</ng-template>
+				  
+				  </td>				  
+                  <td *ngIf="(admin_level == 1)">
+                    <label placement="bottom" ngbTooltip="Sample tooltip on dynamic items" style="cursor: pointer;"
+                      (click)="onClickUpdateFeeDiscount(updateFeeDiscountModel,item.std_id)"
+                      class="badge badge-info">Set Discount
+					  </label>                  
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ********************************** Modals **************************************** -->
+<ng-template #updateFeeDiscountModel let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Scholarship/Discounts</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form class="form-group" #updatefeeDis="ngForm" (ngSubmit)="onClickUpdateFeeDiscDetails(updatefeeDis)">		
+	  <div class="modal-body">
+			<div class="row">
+				<div class="col-md-4 form-group"> 
+					<label class="control-label">Class</label> : <small><b>{{selectedClassName}}</b></small>
+				</div>
+				<div class="col-md-4 form-group"> 
+					<label class="control-label">Section</label> : <small><b>{{selectedSectionName}}</b></small>
+				</div>
+				<div class="col-md-4 form-group"> 
+					<label class="control-label">Roll No</label> : <small><b>{{selectedRollNum}}</b></small>
+				</div>
+				<div class="col-md-6 form-group"> 
+					<label class="control-label">Student Name</label> : <small><b>{{selectedStudentName}}</b></small>
+				</div>
+				<div class="col-md-6 form-group"> 
+					<label class="control-label">Father Name</label> : <small><b>{{selectedFatherName}}</b></small>
+				</div>
+				
+				<div class="col-md-12 form-group"> 
+					<label class="control-label">Discount Amount * (10% etc.)  </label>
+					<input type="number" required class="form-control fm-control" style="margin-top:0em;" name="discount_amount" [(ngModel)]="discount_amount" #pickeddisfeeUpdate="ngModel" max="100" min="1" (keyup)="onClickCalculateDiscount(pickeddisfeeUpdate.value)">
+					<p class="alert alert-danger" *ngIf="!pickeddisfeeUpdate.valid && pickeddisfeeUpdate.touched " style="margin-top:1em; margin-left:0em;"> Fee Discount Amount is required!  </p>
+
+				</div>
+				<div class="col-md-6 form-group"> 
+					<label class="control-label">Tution Fee</label> : {{selectedTutionFee}}
+				</div>
+				<div class="col-md-6 form-group"> 
+					<label class="control-label">After Discount</label> : 
+					<input type="text" disabled class="form-control fm-control" style="float: right;margin-top: 0em;width: 55%;" name="afterdiscount" [(ngModel)]="discountFee">
+
+				</div>
+				<div class="col-md-12 form-group"> 
+					  <label class="control-label">Any comment related to fee discount</label>
+					  <textarea rows="4" cols="40" class="form-control fm-control" name="discount_comment" [(ngModel)]="discount_comment">{{discount_comment}}</textarea>
+				</div>
+				
+			</div>		
+	  </div>
+	  <div class="modal-footer">
+		<input type="submit" class="btn btn-info" [disabled]="!updatefeeDis.form.valid" value="Apply Discount">
+		<button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+	  </div>
+   </form>
+</ng-template>

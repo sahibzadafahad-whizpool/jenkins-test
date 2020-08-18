@@ -1,0 +1,117 @@
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <h4 class="card-title">Manage Fee Heads</h4>
+                    </div>
+                    <div class="col-lg-3">
+                        <button _ngcontent-c2="" (click)="openNgModal(addFeeHeadModel, 'md')" class=" btn btn-success btn-block ">Add Fee Heads <i  class="mdi mdi-plus "></i></button>
+                    </div>
+                    <div class="col-lg-2 col-md-2 ">
+                        <p style="text-align:left !important;">
+                            <button class="btn btn-primary"><i class="fa fa-print">&nbsp;&nbsp;Print</i></button>
+                        </p>
+                    </div>
+                </div>
+       
+
+                <div class="col-lg-12 col-md-12 " style="text-align:center; ">
+                    <span style="color:red; margin-left: 1em; "></span>
+                </div>
+
+                <div class="col-lg-12 col-md-12 ">
+                    <h5>Fee Heads List</h5>
+                    <div class="table-responsive ">
+                        <table class="table table-bordered ">
+                            <thead class="thead-light ">
+                                <tr>
+                                    <th>Fee Head</th>
+                                   <th *ngIf="(admin_level == 1)">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+								<tr *ngFor="let item of feedHeadsData | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+									<td>{{item.head_name}}</td>
+									<td *ngIf="(admin_level == 1)">
+										<label class="badge badge-info" (click)="openEditFeeHeadsModal(updateFeeHeadModel,item.fee_heads_id , index)" style="cursor: pointer;">Edit</label>
+										
+										<label class="badge badge-danger" (click)=deleteFeeHead(item.fee_heads_id) style="cursor: pointer; margin-left: 1em;">Delete </label> 
+									</td>
+								</tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- *********************************** Modals **************************************** -->
+
+
+<!-- ******** add fee discount ************ -->
+
+<ng-template #addFeeHeadModel>
+    <div class="modal-header ">
+        <div style="text-align: center ">
+            <h3>Add Fee Heads</h3>
+        </div>
+        <button type="button" (click)="closeModal()" class="close " aria-label="Close">
+    <span aria-hidden="true ">&times;</span>
+  </button>
+    </div>
+    <form class="form-group " #addFeeHead="ngForm" (ngSubmit)="onClickAddFeeHead(addFeeHead)">
+        <div class="modal-body ">
+
+            <p *ngIf="!feeHeadTitle.valid && feeHeadTitle.touched" class="alert alert-danger " style="margin-top:1em; margin-left:0em; ">
+                Fee Head Name is required!
+            </p>
+
+            <label class="control-label "> Fee Head  *</label>
+            <input [(ngModel)]="feeHeadTitleText" #feeHeadTitle="ngModel" type="text " required placeholder="Fee Head Name " class="form-control fm-control " style="margin-top:0em; " name="feeHeadTitle">
+
+        </div>
+        <div class="modal-footer ">
+            <input type="submit" [disabled]="!addFeeHead.form.valid" class="btn btn-info " value="Set Fee Head ">
+            <button type="button" class="btn btn-light " (click)="closeModal() ">Close</button>
+        </div>
+    </form>
+</ng-template>
+
+<!-- ******** Update Fee Heads ************ -->
+
+<ng-template #updateFeeHeadModel let-modal>
+    <div class="modal-header ">
+        <div style="text-align: center ">
+            <h3>Update Fee Head Detail</h3>
+        </div>
+        <button type="button " class="close " aria-label="Close ">
+    <span aria-hidden="true ">&times;</span>
+  </button>
+    </div>
+    <form class="form-group" #updateFeeHead="ngForm" (ngSubmit)="onClickUpdateFeeHeadDetail(updateFeeHead) ">
+        <div class="modal-body ">
+
+            <p *ngIf="!updateFeeHeadTitle.valid && updateFeeHeadTitle.touched" class="alert alert-danger " style="margin-top:1em; margin-left:0em; ">
+                Fee Head Name is required!
+            </p>
+
+            <label class="control-label "> Fee Head </label>
+			
+			<input type="hidden" class="form-control fm-control" name="fee_heads_id" [(ngModel)]="fee_heads_id">
+					
+            <input [(ngModel)]="head_name" #updateFeeHeadTitle="ngModel" type="text" class="form-control fm-control"  name="head_name">
+
+        </div>
+        <div class="modal-footer ">
+            <input type="submit" [disabled]="!updateFeeHead.form.valid" class="btn btn-info" value="Update ">
+            <button type="button" (click)="modal.close( 'Close click')" class="btn btn-light ">Close</button>
+        </div>
+    </form>
+</ng-template>

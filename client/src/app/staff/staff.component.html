@@ -1,0 +1,789 @@
+<div class="row">
+
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div id="teacher_details_card_body" [ngClass]="teacher_details_card_body ? 'card-body' : 'd-none'">
+        <h4 class="card-title">Staff Details</h4>
+
+
+        <div class="row" style="margin-top: 1em; margin-bottom: 0em; padding-bottom: 1em; padding-top: 1em;">
+          <div class="col-lg-4  ">
+            <input class="form-control fm-control" [(ngModel)]="searchText" (keyup)=searchFromDb(search.value) #search
+              placeholder="CNIC / Phone Number">
+          </div>
+
+          <div class="col-lg-5  ">
+
+          </div>
+
+          <div class="col-lg-3 pull-right " style="padding-bottom: 1.5em;">
+
+            <button _ngcontent-c2="" (click)="prepare_add_teacher()" class="btn btn-success btn-block">New
+              Staff
+              <i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+          </div>
+        </div>
+
+
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="thead-light">
+              <tr>
+                <th># </th>
+                <th>Staff</th>
+                <th>Name </th>
+                <th>Father Name </th>
+                <th>Mobile Phone </th>
+                <th>CNIC </th>
+                
+                <th *ngIf="(admin_level == 1)">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of teachersDataList | filter : searchText  | paginate: { id: 'pager', itemsPerPage: pageSize,  totalItems: totalTeachers, currentPage: pageNumber};let index = index">
+                <td>{{index + 1}} </td>
+                <td> <img (click)="openProfileTeacherModal(teacherProfileModel,item.employee_id, index)" [src]="item.thumb_path == null ?  placeholderPath : item.thumb_path"
+                    class="rounded-circle dropdown-toggle" width="30px" data-toggle="dropdown" alt="avatar"
+                    style=" border-radius: 50%;cursor:pointer;">
+
+
+
+                </td>
+                <td>{{item.employee_name}}</td>
+                <td>{{item.father_name}}</td>
+                <td>{{item.phone_num}}</td>
+                <td> {{item.employee_cnic}}</td>
+
+                <td *ngIf="(admin_level == 1)">
+
+                  <label class="badge badge-info" (click)="prepare_edit_teacher(item.employee_id, index)"
+                    style="cursor: pointer;">Edit</label>
+                  <label class="badge badge-danger" (click)=deleteTeacher(item.employee_id)
+                    style="cursor: pointer; margin-left: 1em;">Delete
+                  </label>
+                  
+                  <label class="badge badge-primary" style="cursor: pointer; margin-left: 1em;" (click)="openProfileTeacherModal(teacherProfileModel,item.employee_id, index)">Profile</label>
+
+                  <label class="badge badge-success" (click)=viewSalarySlip(item)
+                      style="cursor: pointer; margin-left: 1em;">Salary slip
+                  </label>
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="text-align: center ; margin-top: 2em;">
+            <form class="pagination-wrapper">
+              <div class="form-group pages">
+                <pagination-controls class="my-pagination" id="pager" (pageChange)="pageChanged($event)" maxSize="10"
+                  directionLinks="true" autoHide="true" previousLabel="Prev" nextLabel="Next"
+                  screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+                  screenReaderCurrentLabel="You're on page">
+                </pagination-controls>
+              </div>
+
+            </form>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div id="add_teacher_card_body" [ngClass]="add_teacher_card_body ? 'card-body' : 'd-none'">
+
+            <div class="row">
+                <div class="col-6 col-sm-9"><h4 class="card-title">Add Staff</h4></div>
+
+                <div class="col-6 col-sm-3 text-right">
+                  <button _ngcontent-c2="" (click)="show_teachers_list()" class="btn btn-success">Staff List
+                  </button>
+                </div>
+
+            </div>
+
+          <form class="form-group" #addteacher="ngForm" (ngSubmit)="onSubmitAddTeacher(addteacher)">
+           
+                <div class="row">
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Name * <span style="color:red;"
+                        *ngIf="!pickedTname.valid && pickedTname.touched"><small>
+                          Staff Name Required</small> </span></label>
+                    <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="t_name"
+                      placeholder="Staff Name" [(ngModel)]="t_name" #pickedTname="ngModel">
+          
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Name * <span style="color:red;"
+                        *ngIf="!pickedTFname.valid && pickedTFname.touched"><small>
+                          Father Name Required</small> </span></label>
+                    <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="t_father_name"
+                      placeholder="Father Name" [(ngModel)]="t_father_name" #pickedTFname="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">NIC * <span style="color:red;"
+                        *ngIf="!pickedNIC.valid && pickedNIC.touched"><small>
+                          Required</small> </span></label>
+                    <span style="color:red;" *ngIf="cnic_check"><small style="margin-left: 1em;"> CNIC is
+                          already in use</small></span>
+                    <input type="number" style="margin-top:0em;" (keyup)="check_cnicUniqueF(this.teacher_nic)"
+                      class="form-control fm-control" required name="teacher_nic" placeholder="71502425XXXXXX"
+                      [(ngModel)]="teacher_nic" #pickedNIC="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mobile Phone * <span style="color:red;"
+                        *ngIf="!pickedPhoneNum.valid && pickedPhoneNum.touched"><small>
+                          Mobile Phone Required</small> </span></label>
+                    <span style="color:red;" *ngIf="phone_check"><small style="margin-left: 1em;"> Number is
+                        already in use</small></span>
+                    <input type="number" style="margin-top:0em;" required class="form-control fm-control" name="t_phone_num"
+                      (keyup)=setUserName(this.t_phone_num) placeholder="Mobile Phone" [(ngModel)]="t_phone_num"
+                      #pickedPhoneNum="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Home Number</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="t_landline_num"
+                      placeholder="Home Number" ngModel>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Email
+                              <span style="color:red;" *ngIf="checkEmail"><small style="margin-left: 1em;"> Email is
+                        already in use</small></span>
+          
+                          </label>
+                    <input type="text"  style="margin-top:0em;" class="form-control fm-control" name="t_email"
+                      (keyup)=check_emailUniqueF(this.t_email) placeholder="Staff Email" [(ngModel)]="t_email"
+                      #pickedEmail="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Qualification</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_qualification"
+                      placeholder="Qualification" ngModel>
+                  </div>
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Designation</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_desig"
+                      placeholder="Designation" ngModel>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Experience <small style="color:blue;"> ( Years
+                        ) </small></label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_experience"
+                      placeholder="Experience" ngModel>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Gender *</label>
+                    <select required="" class="form-control fm-control" style="margin-top:0em;" [(ngModel)]="t_gender" name="t_gender">
+                      <option [ngValue]="undefined" disabled>Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Religion</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_religion"
+                      placeholder="Religion" ngModel>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Marital Status </label>
+                    <select class="form-control fm-control" style="margin-top:0em;" [(ngModel)]="t_marital_status" name="t_marital_status">
+                      <option [ngValue]="undefined" disabled>Select Marital Status</option>
+                      <option value="single">Single</option>
+                      <option value="married">Married</option>
+                      <option value="divorced">Divorced</option>
+                    </select>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Date Of Birth</label>
+                    <input type="date" style="margin-top:0em;" class="form-control fm-control" name="t_dob" ngModel>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Profile Image</label>
+                    <input id="teacher_image" style="margin-top:0em;" #imageFile accept="image/*" name="teacher_image" type="file"
+                      (change)="fileChangeEvent($event)" class="form-control fm-control" placeholder="Upload a picture..." />
+                      <small>Maximum width 1000px</small>
+                  </div>
+          
+                  <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Final Transcript</label>
+                    <input id="teacher_transcript" style="margin-top:0em;" #imageFile accept="image/*" name="teacher_transcript" type="file"
+                      (change)="transcriptChangeEvent($event)" class="form-control fm-control" placeholder="Upload a picture..." />
+                  </div>
+          
+                  <div class="col-md-6 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Address</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_address"
+                      placeholder="Staff Address" ngModel>
+                  </div>
+          
+                  <!-- last employment record starts from here -->
+          
+                  <div class="col-md-12">
+                      <label class="control-label" style="margin-top:.5em;font-weight: bold;">Last Employment Record</label>
+                  </div>
+          
+                  <div class="col-md-2 form-group">
+                    <label class="control-label" >From Year</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="t_last_employment_from_year"
+                      placeholder="From Year" ngModel>
+                  </div>
+                  <div class="col-md-2 form-group">
+                    <label class="control-label" >To Year</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="t_last_employment_to_year"
+                      placeholder="To Year" ngModel>
+                  </div>
+          
+                  <div class="col-md-3 form-group">
+                    <label class="control-label" >Organization Name</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_last_employment_organization_name"
+                      placeholder="Organization Name" ngModel>
+                  </div>
+          
+                  <div class="col-md-2 form-group">
+                    <label class="control-label" >Position</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_last_employment_position"
+                      placeholder="Position" ngModel>
+                  </div>
+          
+                  <div class="col-md-3 form-group">
+                    <label class="control-label" >Main Duty</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_last_employment_main_duty"
+                      placeholder="Main Duty" ngModel>
+                  </div>
+          
+                  <!-- last employment record ends to here -->
+                  
+                  <!-- Salary fields start from here -->
+                  <div class="col-md-12">
+                    <label class="control-label" style="margin-top:.5em;font-weight: bold;">Salary</label>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Basic Salary *</label>
+                    <input required="" type="number" style="margin-top:0em;" class="form-control fm-control"
+                        name="t_basic_salary" placeholder="Basic Salary" ngModel>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">House Allowance</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control"
+                        name="t_house_allowance" placeholder="House Allowance" ngModel>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Medical Allowance</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control"
+                        name="t_medical_allowance" placeholder="Medical Allowance" ngModel>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Bonus</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control"
+                        name="t_bonus" placeholder="Bonus" ngModel>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Total Salary *</label>
+                    <input required="" type="number" style="margin-top:0em;" class="form-control fm-control"
+                        name="t_salary" placeholder="Salary" ngModel>
+                </div>
+                <!-- Salary fields end here -->
+
+                      <div class="col-md-12 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Staff Description</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="t_desc"
+                      placeholder="staff Description" ngModel>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">User Name
+                      <span style="color:red;" *ngIf="checkUserName"><small style="margin-left: 1em;"> UserName is
+                          already in use</small></span>
+                    </label>
+                    <input type="text" readonly style="margin-top:0em;" required class="form-control fm-control" name="t_username"
+                      (keyup)=isUserNameAdded(this.t_username) placeholder="User Name" [(ngModel)]="t_username"
+                      #pickedUserName="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Password * <span style="color:red;"
+                        *ngIf="!pickedPassw.valid && pickedPassw.touched"><small>
+                          Password Required</small> </span></label>
+                    <input type="text" style="margin-top:0em;" readonly class="form-control fm-control" required name="t_password"
+                      placeholder="Password" [(ngModel)]="t_password" #pickedPassw="ngModel">
+                  </div>
+                
+
+                </div>
+                
+                <div class="row form-group text-right">
+                  <div class="col-12">
+                    <hr/>
+                    <input type="submit" class="btn btn-info"
+                    [disabled]="!addteacher.form.valid || checkUserName || checkCnic || checkPhone || checkEmail"
+                    value="Add Staff">
+                    <button type="button" class="btn btn-light ml-1" (click)="show_teachers_list()">Cancel</button>
+                  </div>  
+                </div>
+
+                </form>
+
+      </div>
+
+      <div id="update_teacher_card_body" [ngClass]="update_teacher_card_body ? 'card-body' : 'd-none'">
+          
+          <div class="row">
+              <div class="col-6 col-sm-9"><h4 class="card-title">Update Staff</h4></div>
+
+              <div class="col-6 col-sm-3 text-right">
+                <button _ngcontent-c2="" (click)="show_teachers_list()" class="btn btn-success">Staff List
+                </button>
+              </div>
+
+          </div>
+          
+          <form class="form-group" #updateTeacher="ngForm" (ngSubmit)="onSubmitUpdateTeacher(updateTeacher)">
+            
+                <div class="row">
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Name * <span style="color:red;"
+                        *ngIf="!pickedTUname.valid && pickedTUname.touched"><small>
+                          Staff Name Required</small> </span></label>
+                    <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="teacher_name"
+                      placeholder="Staff Name" [(ngModel)]="teacher_name" #pickedTUname="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Father Name * <span style="color:red;"
+                        *ngIf="!pickedTFname.valid && pickedTFname.touched"><small>
+                          Father Name Required</small> </span></label>
+                    <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="father_name"
+                      placeholder="Father Name" [(ngModel)]="father_name" #pickedTFname="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">CNIC * <span style="color:red;"
+                        *ngIf="!pickedCNIC.valid && pickedCNIC.touched"><small>
+                          CNIC Required</small> </span>
+                      <span style="color:red;"> <small>
+                          {{cnicNotUnique}}</small> </span>
+                    </label>
+                    <input type="text" style="margin-top:0em;" required
+                      (keyup)="checkUniqueOnUpdate('t_cnic' , pickedCNIC.value )" class="form-control fm-control" name="t_cnic"
+                      placeholder="CNIC" [(ngModel)]="t_cnic" #pickedCNIC="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Mobile Phone * <span style="color:red;"
+                        *ngIf="!pickedPhoneNum.valid && pickedPhoneNum.touched"><small>
+                          Mobile Phone Required</small> </span>
+                      <span style="color:red;"> <small>
+                          {{phoneNumNotUnique}}</small> </span>
+                    </label>
+                    <input type="text" style="margin-top:0em;" required
+                      (keyup)="checkUniqueOnUpdate('t_phonenum' , pickedPhoneNum.value )" class="form-control fm-control"
+                      name="phone_num" placeholder="Mobile Phone" [(ngModel)]="phone_num" #pickedPhoneNum="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Home Number</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="landline_num"
+                      placeholder="Home Number" [(ngModel)]="landline_num">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">User Name
+                      <span style="color:red;" *ngIf="checkUserName"><small style="margin-left: 1em;"> UserName is
+                          already in use</small></span>
+                    </label>
+                    <input type="text" readonly style="margin-top:0em;" required class="form-control fm-control" name="t_username"
+                      (keyup)=isUserNameAdded(this.t_username) placeholder="User Name" [(ngModel)]="username"
+                      #pickedUserName="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Password <small> ( Leave empty if you dont want to change. ) </small></label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="teacher_password"
+                      placeholder="Password" [(ngModel)]="teacher_password">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;"> Email
+          
+                      <span style="color:red;"> <small>
+                          {{emailNotUnique}}</small> </span>
+                    </label>
+                    <input type="text" rquired style="margin-top:0em;"
+                      (keyup)="checkUniqueOnUpdate('t_email' , pickedUEmail.value )" class="form-control fm-control" name="email"
+                      placeholder="Staff Email" [(ngModel)]="email" #pickedUEmail="ngModel">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Qualification</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="teacher_qual"
+                      placeholder="Qualification" [(ngModel)]="teacher_qual">
+                  </div>
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Designation</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="teacher_desig"
+                      placeholder="Designation" [(ngModel)]="teacher_desig">
+                  </div>
+                  
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Experience <small style="color:blue;"> ( Years )
+                      </small></label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="experience"
+                      [(ngModel)]="experience">
+                  </div>
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Gender *</label>
+                    <select required="" class="form-control fm-control" style="margin-top:0em;" [(ngModel)]="gender" name="gender">
+                      <option [ngValue]="undefined" disabled>Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" >Religion</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="teacher_religion"
+                      placeholder="Religion" [(ngModel)]="teacher_religion">
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label">Marital Status </label>
+                    <select class="form-control fm-control" style="margin-top:0em;" [(ngModel)]="marital_status" name="marital_status">
+                      <option [ngValue]="undefined" disabled>Select Marital Status</option>
+                      <option value="single">Single</option>
+                      <option value="married">Married</option>
+                      <option value="divorced">Divorced</option>
+                    </select>
+                  </div>
+          
+                  <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Date Of Birth</label>
+                    <input type="date" style="margin-top:0em;" class="form-control fm-control" name="dob" [(ngModel)]="dob">
+                  </div>
+          
+                  <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0em;">Profile Image</label>  <span *ngIf="!imgValidation" style="color:red;margin-left: 1em;"> <small> Invalid Image Type </small> </span>
+                    <input id="uteacher_image" style="margin-top:0em;" #imageFile accept="image/*" name="uteacher_image"
+                      type="file" (change)="fileChangeEvent($event)" class="form-control fm-control" placeholder="Select" />
+                      <small>Maximum width 1000px</small> &nbsp;            
+                      <a *ngIf="teacher_thumb!=null && teacher_thumb!=''" style="cursor: pointer;color:blue;font-size: 0.9rem;text-decoration: underline;" (click)="openNgImageModal(ViewImageModal,teacher_thumb,'profileimage')">view</a>
+                  </div>
+          
+                  <div class="col-md-3 form-group">
+                    <label class="control-label">Final Transcript</label>
+                    <input id="uteacher_transcript" style="margin-top:0em;" #imageFile accept="image/*" name="uteacher_transcript" type="file"
+                      (change)="transcriptChangeEvent($event)" class="form-control fm-control" placeholder="Upload a picture..." />
+                      <a *ngIf="teacher_transcript_thumb!=null && teacher_transcript_thumb!=''" style="cursor: pointer;color:blue;font-size: 0.9rem;text-decoration: underline;" (click)="openNgImageModal(ViewImageModal,teacher_transcript_thumb,'transcriptimage')">view</a>
+                  </div>
+          
+                  <div class="col-md-6 form-group">
+                    <label class="control-label" style="margin-top:0em;">Address</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="address"
+                      placeholder="Staff Address" [(ngModel)]="address">
+                  </div>
+          
+                  <!-- last employment record starts from here -->
+          
+                  <div class="col-md-12">
+                    <label class="control-label" style="margin-top:.5em;font-weight: bold;">Last Employment Record</label>
+                </div>
+          
+                <div class="col-md-2 form-group">
+                  <label class="control-label" >From Year</label>
+                  <input type="number" style="margin-top:0em;" class="form-control fm-control" name="last_employment_from_year"
+                    placeholder="From Year" [(ngModel)]="  last_employment_from_year">
+                </div>
+                <div class="col-md-2 form-group">
+                  <label class="control-label" >To Year</label>
+                  <input type="number" style="margin-top:0em;" class="form-control fm-control" name="last_employment_to_year"
+                    placeholder="To Year" [(ngModel)]="  last_employment_to_year">
+                </div>
+          
+                <div class="col-md-3 form-group">
+                  <label class="control-label" >Organization Name</label>
+                  <input type="text" style="margin-top:0em;" class="form-control fm-control" name="last_employment_organization_name"
+                    placeholder="Organization Name" [(ngModel)]="  last_employment_organization_name">
+                </div>
+          
+                <div class="col-md-2 form-group">
+                  <label class="control-label" >Position</label>
+                  <input type="text" style="margin-top:0em;" class="form-control fm-control" name="last_employment_position"
+                    placeholder="Position" [(ngModel)]="  last_employment_position">
+                </div>
+          
+                <div class="col-md-3 form-group">
+                  <label class="control-label" >Main Duty</label>
+                  <input type="text" style="margin-top:0em;" class="form-control fm-control" name="last_employment_main_duty"
+                    placeholder="Main Duty" [(ngModel)]="  last_employment_main_duty">
+                </div>
+          
+                <!-- last employment record ends to here -->
+          
+                <!-- Salary fields start from here -->
+
+                <div class="col-md-12">
+                  <label class="control-label" style="margin-top:.5em;font-weight: bold;">Salary</label>
+              </div>
+
+              <div class="col-md-3 form-group">
+                  <label class="control-label" style="margin-top:.5em;">Basic Salary *</label>
+                  <input required="" type="number" style="margin-top:0em;" class="form-control fm-control"
+                      name="teacher_basic_salary" placeholder="Basic Salary" [(ngModel)]="teacher_basic_salary">
+              </div>
+
+              <div class="col-md-3 form-group">
+                  <label class="control-label" style="margin-top:.5em;">House Allowance</label>
+                  <input type="number" style="margin-top:0em;" class="form-control fm-control"
+                      name="teacher_house_allowance" placeholder="House Allowance" [(ngModel)]="teacher_house_allowance">
+              </div>
+
+              <div class="col-md-3 form-group">
+                  <label class="control-label" style="margin-top:.5em;">Medical Allowance</label>
+                  <input type="number" style="margin-top:0em;" class="form-control fm-control"
+                      name="teacher_medical_allowance" placeholder="Medical Allowance" [(ngModel)]="teacher_medical_allowance">
+              </div>
+
+              <div class="col-md-3 form-group">
+                  <label class="control-label" style="margin-top:.5em;">Bonus</label>
+                  <input type="number" style="margin-top:0em;" class="form-control fm-control"
+                      name="teacher_bonus" placeholder="Bonus" [(ngModel)]="teacher_bonus">
+              </div>
+
+              <div class="col-md-4 form-group">
+                  <label class="control-label" style="margin-top:0em;">Total Salary *</label>
+                  <input required type="number" style="margin-top:0em;" class="form-control fm-control" placeholder="Total Salary"
+                      name="teacher_salary" [(ngModel)]="teacher_salary">
+              </div>
+
+              <!-- Salary fields end here -->
+
+              <div class="col-md-12 form-group">
+                <label class="control-label" style="margin-top:0em;">Staff Description</label>
+                <input type="text" style="margin-top:0em;" class="form-control fm-control" name="  tDesc"
+                  placeholder="Staff Description" [(ngModel)]="  tDesc">
+              </div>
+          
+          
+              <input type="hidden" style="margin-top:0em;" class="form-control fm-control" name="teacher_id"
+                [(ngModel)]="teacher_id">
+          
+                </div>
+          
+          
+            
+            <div class="row form-group text-right">
+                <div class="col-12">
+                      <hr/>
+                      <input type="submit" class="btn btn-info"  [disabled]="!updateTeacher.form.valid"
+                        value="Update">
+                      <button type="button" class="btn btn-light ml-1" (click)="show_teachers_list()">Cancel</button>
+                </div>
+                 
+            </div>
+             </form>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- View image modal  -->
+
+<ng-template #ViewImageModal let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h4>{{ ImageModalTitle }}</h4>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+    
+  <div class="modal-body p-1">
+
+      <div class="row">
+          <div class="col-md-12 text-center">
+              <img [src]="ViewImageModalImage == '' ?  placeholderPath : ViewImageModalImage" style="max-width:20rem;">
+          </div>
+      </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+
+</ng-template>
+
+<!-- View Staff -->
+
+<ng-template #teacherProfileModel let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Staff Details</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+   <form class="form-group" #updateTeacher="ngForm" (ngSubmit)="onSubmitUpdateTeacher(updateTeacher)">
+    <div class="modal-body">
+      <div class="row">
+          <div class="col-lg-3 col-md-3 col-sm-3">
+              <div class="card">
+                  <div class="profile-wrap animated fadeIn">
+                    <div class="profile-foot" style="margin: 1.1em;">
+                      <h4>{{teacher_name}} </h4>
+                      </div>
+                      <div class="info-wrap">
+                          <div class="avatar-wrap">
+                              <img (click)="openNgImageModal(ViewImageModal,teacher_thumb,'profileimage')" [src]="teacher_thumb == null ?  placeholderPath : teacher_thumb" alt="Profile Picture Not Found!" style="margin: 1.1em; width: 14.5em;" onError="this.src='assets/images/placeholder.png';">
+                          </div>
+                          
+                      </div>
+                  </div>
+              </div>
+              <div *ngIf="teacher_transcript_image_for_viewimagemodal != null" class="card">
+                <div class="profile-wrap animated fadeIn">
+                      <div class="info-wrap">
+                          <div class="avatar-wrap">
+                              <img (click)="openNgImageModal(ViewImageModal,teacher_transcript_thumb,'transcriptimage')" [src]="teacher_transcript_thumb == null ?  placeholderPath : teacher_transcript_thumb" alt="Transcript Not Found!" style="margin: 1.1em; width: 14.5em;" onError="this.src='assets/images/placeholder.png';">
+                          </div>
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-9 col-md-9 col-sm-10">
+
+
+            <ngb-tabset class="tab-solid tab-solid-primary">
+              <ngb-tab>
+                  <ng-template ngbTabTitle>
+                      Basic Info
+                  </ng-template>
+                  <ng-template ngbTabContent>
+          
+                      <div class="card">
+          
+                          <table class="table table-hover">
+          
+                            <tbody>
+                              <tr>
+                                  <td> <strong>Name : </strong> {{ teacher_name }} </td>
+                              </tr>
+                              <tr>
+                                  <td> <strong> Father Name : </strong> {{ father_name }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Email : </strong> {{ email }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Phone Number : </strong> {{ phone_num }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> CNIC : </strong> {{ t_cnic }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Qualification : </strong> {{ teacher_qual }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Designation : </strong> {{ teacher_desig }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Salary : </strong> {{ teacher_salary }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Experience : </strong> {{ experience }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Gender : </strong> {{ gender }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Date Of Birth : </strong> {{ dob }} </td>
+                              </tr>
+          
+                              <tr>
+                                <td> <strong> Marital Status : </strong> {{ marital_status }} </td>
+                              </tr>
+          
+                              <tr>
+                                <td> <strong> Religion : </strong> {{ teacher_religion }} </td>
+                              </tr>
+          
+                              <tr>
+                                <td> <strong> Address : </strong> {{ address }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Staff Description : </strong> {{ tDesc }} </td>
+                              </tr>
+          
+                              </tbody>
+          
+                          </table>
+                      </div>
+          
+                  </ng-template>
+              </ngb-tab>
+          
+          
+              <ngb-tab>
+                  <ng-template ngbTabTitle>
+                      Last Employment
+                  </ng-template>
+                  <ng-template ngbTabContent>
+          
+                      <div class="card">
+          
+                          <table class="table table-hover">
+          
+                            <tbody>
+                              <tr>
+                                  <td> <strong>From Year : </strong> {{ last_employment_from_year }} </td>
+                              </tr>
+                              <tr>
+                                  <td> <strong> To Year : </strong> {{ last_employment_to_year }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Organization Name : </strong> {{ last_employment_organization_name }} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Position : </strong> {{ last_employment_position}} </td>
+                              </tr>
+                              <tr>
+                                <td> <strong> Main Duty : </strong> {{ last_employment_main_duty }} </td>
+                              </tr>
+                              
+                              </tbody>
+          
+                          </table>
+                      </div>
+          
+                  </ng-template>
+              </ngb-tab>
+          
+          </ngb-tabset>
+          </div>
+
+      </div>
+  </div>
+   </form>
+</ng-template>
+

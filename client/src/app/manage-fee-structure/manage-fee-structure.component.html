@@ -1,0 +1,163 @@
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h4 class="card-title">Manage Fee Structure</h4>
+                    </div>
+                    <div class="col-lg-5 col-md-5">
+
+                    </div>
+                    <div class="col-lg-3">
+                        <button _ngcontent-c2="" (click)=" openNgModal(addFeeStructModel, 'md')" class="btn btn-success btn-block">
+              Add Fee Structure
+              <i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-12 col-md-12" style="text-align: center">
+                    <h5 style="color: red;"> {{dbRespMsg}}</h5>
+                </div>
+                <div class="table-responsive" *ngIf="showTable">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>S.no</th>
+                                <th>Class</th>
+                                <th>Tuition Fee</th>
+                                <th>Subject Group</th>
+                                <!-- <th>Fee Title</th> -->
+                                <th>Session</th>
+                                <th *ngIf="(admin_level == 1)">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of feeStructDataList  let index = index">
+                                <td>{{index + 1}}</td>
+                                <td>{{item.class_name}}</td>
+                                <td>{{item.fee_amount}}</td>
+                                <td>{{ item.sub_class_name ? item.sub_class_name : 'Default'}}</td>
+                                <td>{{item.year}}</td>
+                                <td *ngIf="(admin_level == 1)">
+                                    <label style="cursor: pointer;" class="badge badge-primary" (click)="openUpdateFeeStructModal(updateFeeStructModel,item.id)">Edit</label>
+                                    <label class="badge badge-danger" style="cursor: pointer; margin-left: 1em;" (click)="onClickDelFeeStruct(item.id)">Delete</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- *********************************** Modals **************************************** -->
+
+
+
+<!-- ******** Update Fee Struct ************ -->
+<ng-template #addFeeStructModel let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Add Free Structure</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <form class="form-group" #addfeeS="ngForm" (ngSubmit)="onClickAddFeeStruc(addfeeS)">
+        <div class="modal-body">
+
+            <label class="control-label"> Class *</label>
+			<span style="color:red; margin-left: 1em;" *ngIf="!pickedCLassE.valid && pickedCLassE.touched"><small>Class Required</small></span>
+			<select class="form-control fm-control" style="margin-top:0em;" #pickedCLassE [(ngModel)]="class_id" name="class_id">
+			<option [ngValue]="undefined" disabled>Select Class</option>
+			<option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}</option>
+			</select>
+			<div *ngIf="is_subject_group_allow">
+				<label class="control-label"> Subject Group</label>
+				<span style="color:red; margin-left: 1em;" *ngIf="!pickedHead.valid && pickedHead.touched"><small>Subject Group Required</small></span>
+				<select class="form-control fm-control" style="margin-top:0em;" #pickedHead [(ngModel)]="sub_class_id" name="sub_class_id">
+					<option [ngValue]="undefined" disabled>Select Subject Group</option>
+					<option *ngFor="let item of subClassData" [value]="item.sub_class_id">{{item.sub_class_name}}</option>
+				</select>
+			</div>
+	  
+
+            <!-- <label class="control-label"> Fee Title *</label>
+            <span style="color:red; margin-left: 1em;" *ngIf="!pickedFeeTitle.valid && pickedFeeTitle.touched"><small>Fee
+          Title
+          Required</small></span>
+            <input type="text" required class="form-control fm-control" name="fee_title" [(ngModel)]="fee_title" #pickedFeeTitle="ngModel"> -->
+
+            <label class="control-label">Tuition Fee *</label>
+            <input type="number" required class="form-control fm-control" name="fee_amount" [(ngModel)]="fee_amount" #pickedfeeA="ngModel">
+            <p class="alert alert-danger" *ngIf="!pickedfeeA.valid && pickedfeeA.touched" style="margin-top:1em; margin-left:0em;">
+                Tuition fee is required!
+            </p>
+
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-info" [disabled]="!addfeeS.form.valid" value="Add">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </form>
+</ng-template>
+
+
+
+<!-- ******** Update Fee Struct ************ -->
+
+
+
+<ng-template #updateFeeStructModel let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Update Fee Structure</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <form class="form-group" #updatefeeS="ngForm" (ngSubmit)="onClickUpdateFeeStruc(updatefeeS)">
+        <div class="modal-body">
+
+            <label class="control-label"> Class </label>
+
+            <input type="text" disabled class="form-control fm-control" name="class_idU" [(ngModel)]="class_idU">
+            <input type="hidden" class="form-control fm-control" name="fee_sructId" [(ngModel)]="fee_sructId">
+			<div *ngIf="is_subject_group_allow">
+				<label class="control-label"> Subject Group</label>
+				<span style="color:red; margin-left: 1em;" *ngIf="!pickedHead.valid && pickedHead.touched"><small>Subject Group Required</small></span>
+				<select class="form-control fm-control" style="margin-top:0em;" #pickedHead [(ngModel)]="sub_class_id" name="sub_class_id">
+				<option [ngValue]="undefined" >Default Subject Group</option>
+				<!-- <option *ngFor="let item of subClassData" [value]="item.sub_class_id">{{item.sub_class_name}}</option> -->
+				</select>
+			</div>
+            <!-- <label class="control-label"> Fee Title *</label>
+            <span style="color:red; margin-left: 1em;" *ngIf="!pickedFeeTitleU.valid && pickedFeeTitleU.touched"><small>Fee
+          Title
+          Required</small></span>
+            <input type="text" required class="form-control fm-control" name="fee_titleU" [(ngModel)]="fee_titleU" #pickedFeeTitleU="ngModel"> -->
+
+            <label class="control-label">Tuition Fee *</label>
+            <input type="number" required class="form-control fm-control" name="fee_amountU" [(ngModel)]="fee_amountU" #pickedfeeA="ngModel">
+            <p class="alert alert-danger" *ngIf="!pickedfeeA.valid && pickedfeeA.touched" style="margin-top:1em; margin-left:0em;">
+                Tuition fee is required!
+            </p>
+
+
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-info" [disabled]="!updatefeeS.form.valid" value="Update">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </form>
+
+</ng-template>

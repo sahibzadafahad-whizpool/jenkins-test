@@ -1,0 +1,70 @@
+<nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
+        <a class="navbar-brand brand-logo" href="/">
+            <!-- <img src="assets/images/avatar.png" alt="logo" /> -->
+            <h3 style="margin-top: .5em;"> {{ schooName }}</h3>
+
+        </a>
+        <a class="navbar-brand brand-logo-mini" href="/">
+            <!-- <img src="assets/images/avatar.png" alt="logo" /> -->
+            <h3 style="margin-top: .5em;"> {{ schooName }}</h3>
+        </a>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-center">
+        <ul class="navbar-nav navbar-nav-left header-links d-none d-md-flex">
+            <li class="nav-item">
+                <a routerLink="/" routerLinkActive="active" class="nav-link">
+                    <i class="menu-icon mdi mdi-home"></i> Home
+
+                </a>
+            </li>
+
+            <!--   <li class="nav-item">
+                <a routerLink="/settings" routerLinkActive="active" class="nav-link">
+                    <i class="menu-icon mdi mdi-settings"></i> Settings
+
+                </a>
+            </li> -->
+            <li class="nav-item">
+                <a routerLink="/announcements" routerLinkActive="active" class="nav-link">
+                    <i class="menu-icon mdi mdi-microphone"></i>Announcements</a>
+            </li>
+            <li class="nav-item">
+                <a routerLink="/users" routerLinkActive="active" class="nav-link">
+                    <i class="menu-icon mdi mdi-comment-account"></i>Admins</a>
+            </li>
+            <li class="nav-item">
+                <a routerLink="/expense" routerLinkActive="active" class="nav-link">
+                    <i class="menu-icon mdi mdi-cash"></i>Expenses</a>
+            </li>
+
+               <li class="nav-item">
+                <a routerLink="/settings" routerLinkActive="active" class="nav-link">
+                   Current Session : {{ running_session }}</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav navbar-nav-right">
+
+            <li class="nav-item dropdown d-none d-xl-inline-block" ngbDropdown>
+                <a class="nav-link dropdown-toggle" id="UserDropdown" ngbDropdownToggle>
+                    <span class="profile-text">{{ user_name }}</span>
+                    <img class="img-xs rounded-circle" src="assets/images/faces/face1.png" alt="Profile image">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" ngbDropdownMenu aria-labelledby="UserDropdown">
+
+
+                    <a class="dropdown-item" routerLink="/settings" routerLinkActive="active">
+            Settings
+          </a>
+                    <a class="dropdown-item mt-2" (click)="logoutFun()" style="cursor:pointer;">
+            Sign Out
+          </a>
+
+                </div>
+            </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" (click)="toggleOffcanvas()">
+      <span class="mdi mdi-menu"></span>
+    </button>
+    </div>
+</nav>

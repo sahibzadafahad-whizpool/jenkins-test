@@ -1,0 +1,323 @@
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="row" style="padding-bottom: 1em;">
+          <div class="col-lg-5">
+              <h4 class="card-title">Expense / Income Heads</h4>
+          </div>
+
+          <div class="col-lg-7 pull-right text-right">
+              <button _ngcontent-c2="" (click)="prepare_add_category_modal(addExpenseCategoryModel , 'md')" class="btn btn-success">
+              <i _ngcontent-c2="" class="mdi mdi-plus"></i> Expense / Income Category
+              </button>
+            <button _ngcontent-c2="" (click)="prepare_add_head_modal(addExpenseHead , 'md')" class="btn btn-success ml-1">
+              <i _ngcontent-c2="" class="mdi mdi-plus"></i> Expense / Income Head
+            </button>
+
+          </div>
+          <div class="col-12">
+          <div style="text-align: center;">
+            <span style="color:red"> {{expense_notification}}</span>
+          </div>
+          </div>
+        </div>
+
+
+        <!-- below is old design for showing Expenses -->
+
+        <div class="row">
+            <div class="table-responsive" style="overflow-x: hidden;">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3">
+                      <div class="list-group" style="padding-top: 0px; width: -webkit-fill-available;">
+
+                            <p class="list-group-item mini-sidebar">
+                                <i class="fa fa-university"></i>
+                                <span> Categories</span>
+                            </p>
+                            <a id="category_sidebar_{{category.id}}" *ngFor="let category of expense_categories" class="list-group-item" [ngClass]="selectedCategoryId==category.id?'category_a_active':''" style="cursor: pointer;" class="list-group-item" (click)="onClickSideBar(category)">
+                                <span>{{category.expense_category_name}}</span>
+                            </a>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                         
+                          <div class="row">
+                              <div style="text-align: center">
+                                  <div class="mini-heading ">
+                                            <h3 *ngIf="selectedCategoryName!=''"> {{selectedCategoryName}} details</h3>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="row">
+                            <table id="expense_category_heads_table" class="table table-bordered table-hover">
+            <thead class="thead-light">
+              <tr>
+                                  <th>Expense / Income Title</th>
+                                  <th style="width:30%;">Description</th>
+                <th *ngIf="(admin_level == 1)">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                                  *ngFor="let item of expense_head_details;let index = index">
+                                  <td>{{item.head_name}}</td>
+                                  <td>{{item.description}}</td>
+                <td *ngIf="(admin_level == 1)">
+                            <!-- <label class="btn btn-xs btn-xs1 btn-info" (click)=openViewExpenseModal(viewExpenseModel,index)
+                                      style="cursor: pointer;margin-right:5px">View Expense</label>   -->
+
+                            <!-- <label class="btn btn-xs btn-xs1 btn-success" (click)=OpenAddExpense(addExpenseModel,index)
+                                      style="cursor: pointer;">Add Expense + </label> -->
+
+                                    <button [disabled]="processing_request" (click)="prepare_edit_expense_head_modal(editExpenseHeadModal,index)" class="btn btn-success btn-xs">Edit</button>
+                                    <button [disabled]="processing_request" (click)="delete_expense_head(item.expenses_head_id)" class="btn btn-danger btn-xs ml-1">Delete</button>
+
+                </td>
+              </tr>
+                                <tr *ngIf="no_expense_heads" style="color:red;">
+                                    <td colspan="2">
+                                        No head added in this category yet
+                                    </td>
+                                    <td>
+                                      <button [disabled]="processing_request" (click)="delete_expense_category()" class="btn btn-danger btn-xs ml-1">Delete</button>
+                                    </td>
+                                </tr>
+            </tbody>
+          </table>
+
+              </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- add expense category modal  -->
+<ng-template #addExpenseCategoryModel let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Add Expense / Income Category</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+     <form class="form-group" #addexpensecategory="ngForm" (ngSubmit)="add_newExpenseCategory(addexpensecategory)">
+  <div class="modal-body pt-3 pb-3">
+
+      <div class="row">
+        <label class="control-label"> Category Name *</label>
+
+        <input required type="text" class="form-control fm-control" name="u_expense_category" placeholder="Category Name"
+          [(ngModel)]="u_expense_category" #pickedUExpenseCategoryTitle="ngModel">
+      </div>
+
+      <div class="row mt-3">
+          <label class="control-label col-12 pl-0 mb-1"> Category Type *</label>
+
+          <div class="col-sm-3">
+              <input [(ngModel)]="expense_type" value="2" type="radio" class="fm-control mt-2 mr-1" id="expense_type_expenditure" name="expense_type">
+              <label class="control-label" for="expense_type_expenditure"> Expense</label>
+          </div>
+
+          <div class="col-sm-3">
+            <input [(ngModel)]="expense_type" value="1" checked="" type="radio" class="fm-control mt-2 mr-1" id="expense_type_income" name="expense_type">
+              <label class="control-label" for="expense_type_income"> Income</label>
+        </div>
+
+          
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <input type="submit" class="btn btn-info" [disabled]="!addexpensecategory.form.valid || processing_request" value="Save">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+      </div>
+    </form>
+</ng-template>
+
+<!-- Add New Expense Head -->
+<ng-template #addExpenseHead let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Add Expense / Income Head</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+     <form class="form-group" #addexpensehead="ngForm" (ngSubmit)="add_newExpensehead(addexpensehead)">
+  <div class="modal-body pt-1 pb-1">
+
+      <div class="row form-group">
+          <label class="control-label col-12 pl-0"> Expense / Income Category *</label>
+          
+          <select required="" (change)="add_expense_category_dropdown_changed($event,addExpenseCategoryModel)" class="form-control fm-control" name="add_expense_category" [(ngModel)]="add_expense_category" id="add_expense_category">
+            <option [ngValue]="undefined" disabled>Select Expense / Income Category</option>
+            <option [value]="-1">+ New Category</option>
+            <option *ngFor="let category of expense_categories" [value]="category.id">
+              {{category.expense_category_name}}
+            </option>
+          </select>
+
+  </div>
+
+      <div class="row form-group">
+          <label class="control-label col-12 pl-0"> Expense / Income Head *</label>
+          <input type="text" required class="form-control fm-control" name="head_name" placeholder="Expense / Income Head"
+          [(ngModel)]="head_name" #pickedExpHead="ngModel">
+          <p class="alert alert-danger" *ngIf="!pickedExpHead.valid && pickedExpHead.touched"
+            style="margin-top:1em; margin-left:0em;width: 100%;padding: .15rem 1.25rem;">
+            Expense / Income head is required!
+          </p>
+</div>
+
+
+      <div class="row form-group">
+        
+        <label class="control-label"> Expense / Income Description</label>
+        
+        <textarea placeholder="Expense / Income Description" rows="4" cols="50" class="form-control fm-control" name="description"
+          [(ngModel)]="description" #pickedExpDesc="ngModel"></textarea>
+        
+      </div>
+
+
+  </div>
+  <div class="modal-footer">
+   <input type="submit" class="btn btn-info" [disabled]="!addexpensehead.form.valid || processing_request" value="Add Expense / Income Head">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+    </form>
+</ng-template>
+
+<ng-template #editExpenseHeadModal let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Update Expense / Income Head</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+     <form class="form-group" #editexpensehead="ngForm" (ngSubmit)="edit_Expensehead(editexpensehead)">
+  <div class="modal-body pt-1 pb-1">
+
+      <div class="row form-group">
+          <label class="control-label col-12 pl-0"> Expense / Income Category *</label>
+          
+          <select disabled="" required="" class="form-control fm-control" name="edit_expense_category" [(ngModel)]="edit_expense_category">
+            <option [ngValue]="undefined" disabled>Select Expense / Income Category</option>
+            <option [value]="-1">+ New Category</option>
+            <option *ngFor="let category of expense_categories" [value]="category.id">
+              {{category.expense_category_name}}
+            </option>
+          </select>
+
+      </div>  
+
+      <div class="row form-group">
+          <label class="control-label col-12 pl-0"> Expense / Income Head *</label>
+          <input type="text" required class="form-control fm-control" [(ngModel)]="edit_head_name" name="edit_head_name" placeholder="Expense Head"
+          #pickedEditExpHead="ngModel">
+          <p class="alert alert-danger" *ngIf="!pickedEditExpHead.valid && pickedEditExpHead.touched"
+            style="margin-top:1em; margin-left:0em;width: 100%;padding: .15rem 1.25rem;">
+            Expense / Income head is required!
+          </p>
+      </div>
+        
+
+      <div class="row form-group">
+        
+        <label class="control-label"> Expense / Income Description</label>
+        
+        <textarea placeholder="Expense / Income Description" rows="4" cols="50" class="form-control fm-control" name="edit_expense_head_description"
+          [(ngModel)]="edit_expense_head_description" #pickedEditExpDesc="ngModel"></textarea>
+        
+      </div>
+
+
+  </div>
+  <div class="modal-footer">
+   <input type="submit" class="btn btn-info" [disabled]="!editexpensehead.form.valid || processing_request" value="Update Expense Head">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+    </form>
+</ng-template>
+
+<!-- add expense modal  -->
+<ng-template #addExpenseModel let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Add New Expense / Income</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+     <form class="form-group" #addexpense="ngForm" (ngSubmit)="add_newExpense(addexpense)">
+  <div class="modal-body">
+
+      <div class="row">
+        <label class="control-label"> Expense / Income Head</label>
+
+        <input type="text" readonly class="form-control fm-control" name="u_expense_head" placeholder="Expense Head"
+          [(ngModel)]="u_expense_head" #pickedUExpTitle="ngModel">
+
+        <label class="control-label">Expense / Income Date * </label>
+        <input type="date" required class="form-control fm-control" name="expense_date" [(ngModel)]="expense_date"
+          #pickedExpenseDate="ngModel">
+        <p class="alert alert-danger" *ngIf="!pickedExpenseDate.valid && pickedExpenseDate.touched"
+          style="margin-top:1em; margin-left:0em;width: 100%;padding: .15rem 1.25rem;">
+          Expense / Income Date is required!
+        </p>
+        <label class="control-label">Expense / Income Amount * </label>
+        <input placeholder="Enter amount" type="number" required class="form-control fm-control" name="expense_amount" [(ngModel)]="expense_amount"
+          #pickedExpenseAmount="ngModel">
+        <p class="alert alert-danger" *ngIf="!pickedExpenseAmount.valid && pickedExpenseAmount.touched"
+          style="margin-top:1em; margin-left:0em;width: 100%;padding: .15rem 1.25rem;">
+          Expense / Income Amount is required!
+        </p>
+
+      </div>
+
+
+  </div>
+  <div class="modal-footer">
+   <input type="submit" class="btn btn-info" [disabled]="!addexpense.form.valid || processing_request" value="Add New Expense / Income">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+    </form>
+</ng-template>
+
+<!-- View  Expense Model  -->
+<ng-template #viewExpenseModel let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>View Expenses</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+</ng-template>

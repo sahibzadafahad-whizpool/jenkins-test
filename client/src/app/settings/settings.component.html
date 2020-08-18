@@ -1,0 +1,292 @@
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-9 col-md-9">
+                        <h4 class="card-title">Settings</h4>
+                    </div>
+                    <div class="col-lg-3" style="padding-bottom: 1.5em;">
+                        <button _ngcontent-c2="" (click)="openNgModal(addNewSession , 'md')" class="btn btn-success btn-block">Add New Session<i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+                    </div>
+                </div>
+
+                <ngb-tabset class="tab-solid tab-solid-primary">
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            List Session Details
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <div class="table-responsive">
+                                <div class="col-md-12 form-group" style="text-align: center">
+                                    <span><h3>*Note </h3> </span>
+                                    <span>
+										<h4> 
+											All new Student will be Registered in Active Session : <strong style="color: green;">{{activeSession}} </strong> 
+										</h4>
+										<small style="color: brown"></small>
+									</span>
+                                </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th># </th>
+                                            <th> Session </th>
+                                            <th> Start Date </th>
+                                            <th> End Date </th>
+                                            <th>Status </th>
+                                            <th *ngIf="(admin_level == 1)">Actions</th>
+                                            <th> Edit </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of sessionData | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+                                            <td>{{index + 1}}</td>
+                                            <td [style.color]="item.status == 0 ? 'black' : 'green'">{{item.session_name}}</td>
+                                            <td> {{ item.start_date * 1000 | date}} </td>
+                                            <td> {{ item.end_date * 1000 | date }}</td>
+
+                                            <td [style.color]="item.status == 0 ? 'brown' : 'green'">
+                                                {{ item.status == '1' ? 'Active' : 'Inactive'}}
+                                            </td>
+
+                                            <td *ngIf="(admin_level == 1)">
+                                                <span *ngIf="(item.status == 0)" class="badge badge-primary" (click)=setSessionActive(item.session_id) style="cursor: pointer;">Set Active</span>
+                                                <span *ngIf="(item.status == 1)" style="color: green"><strong>Currently Running Session</strong></span>
+                                            </td>
+                                            <td>
+                                                <label class="badge badge-info" (click)="openUpdateSessionModal(upd_SessionModal,index)" style="cursor: pointer;">Edit</label>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </ng-template>
+                    </ngb-tab>
+
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            School Info
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 " style="margin-bottom: -2em;">
+									<div class="col-md-12 form-group" style="text-align: center"> <span>
+										<h4> 
+											School Information
+										</h4>
+										<small style="color: brown"></small></span>
+										<img *ngIf="updated_school_logo!=null && updated_school_logo!=''" src="{{updated_school_logo}}" style="height:100px" alt="School LOGO">
+										
+									</div>
+                                    <form class="form-group" #schoolInfo="ngForm" (ngSubmit)="schoolInfoUpdate(schoolInfo)">
+                                        <label class="control-label" style="margin-top:.5em;">
+											School Name * <span style="color:red;" *ngIf="!pickedSchhol.valid && pickedSchhol.touched"><small> School Name Required</small> </span>
+										</label>
+                                        <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="school_name" placeholder="name" [(ngModel)]="school_name" #pickedSchhol="ngModel">
+
+                                        <!-- add image field in tbl_school info-->
+                                        <label class="control-label" style="margin-top:.5em;">School Logo</label><span *ngIf="!imgValidation" style="color:red;margin-left: 1em;"> <small> Invalid Image Type </small> </span>
+                                     	 <input id="school_logo" style="margin-top:0em;" #imageFile accept="image/*" name="school_logo" type="file" (change)="fileChangeEvent($event)" class="form-control fm-control" placeholder="Upload a picture..." />
+										 
+
+                                        <label class="control-label" style="margin-top:.5em;">
+											School Phone Number * <span style="color:red;" *ngIf="!pickedphon.valid && pickedphon.touched"><small>Phone Number Required</small> </span></label>
+                                        <input type="number" required style="margin-top:0em;" class="form-control fm-control" name="school_phone" placeholder="phone number" [(ngModel)]="school_phone" #pickedphon="ngModel">
+                                        <label class="control-label" style="margin-top:.5em;">
+											School Address * <span style="color:red;" *ngIf="!pickedaddress.valid && pickedaddress.touched"><small>School Name Required</small> </span>
+										</label>
+                                        <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="school_address" placeholder="Address" [(ngModel)]="school_address" #pickedaddress="ngModel">
+                                        <div style="margin-top:1em ; text-align:right">
+                                            <input type="submit" class="btn btn-info" style="margin-top:0 em" [disabled]="!schoolInfo.form.valid " value="Update">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </ngb-tab>
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            Fee
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <div class="row">
+								<div class="col-md-12 form-group" style="text-align: center"> <span>
+										<h4> 
+											Promotional Message
+										</h4>
+										<small style="color: brown"></small></span>
+                                </div>
+                                <div class="col-lg-12 col-md-12 ">
+                                    <form class="form-group" #updatePromotionalMessag="ngForm" (ngSubmit)="onSubmitUpdatePromotionalMessage(updatePromotionalMessag)">
+                                        <div class="col-md-12 form-group">
+                                            <label class="control-label" style="margin-top:0em;">
+												Promotional Message * <span style="color:red;" *ngIf="!pickedUname.valid && pickedUname.touched"><small> Required</small> </span>
+												</label>
+
+                                            <textarea rows="4" cols="50" required class="form-control fm-control" name="u_promotional_message" [(ngModel)]="u_promotional_message" #pickedUname="ngModel"> </textarea>
+
+                                        </div>
+
+                                        <div class="col-md-12 form-group modal_button" style="text-align:right;">
+                                            <input type="submit" class="btn btn-info" style="margin-top:0 em" [disabled]="!updatePromotionalMessag.form.valid " value="Update Promotion Message">
+                                        </div>
+                                    </form>
+                                </div>
+							</div>
+							 <hr/>
+                            <form class="form-group" #feeSettings="ngForm" (ngSubmit)="UpdatefeeSettings(feeSettings)">
+							<div class="col-md-12 form-group">
+									<div class="col-md-12 form-group" style="text-align: center"> <span>
+										<h4> 
+											Fee Settings
+										</h4>
+										<small style="color: brown"></small></span>
+									</div>                                   
+                                        <div class="row">
+									   <div class="col-md-4">
+											<label class="control-label ">Due Date</label><br/>
+											<input type="text" required style="margin-top:0em;width:66px;float:left" class="form-control fm-control" name="fee_due_date" placeholder="Due Fee Date" [(ngModel)]="fee_due_date">
+											<input type="text" style="margin-top:0em;width:66px;float:left" class="form-control fm-control" name="feemonth" [value] ="feemonth" placeholder="Fee Month" disabled >
+											<input type="text" style="margin-top:0em;width:66px;float:left" class="form-control fm-control" name="feeyear" [value] ="feeyear" placeholder="Fee Year" disabled >
+
+										</div>
+										<div class="col-md-3 form-group">
+											<label class="control-label ">Late Fee</label>
+											<input type="text"  required  style="margin-top:0em;" class="form-control fm-control" name="late_fee" placeholder="Late Fee Fine" [(ngModel)]="late_fee">
+										</div>
+										<div class="col-md-3 form-group">
+											<label class="control-label ">Fee Print Columns</label>
+											<input type="int"  required  style="margin-top:0em;width:200px;float:left" class="form-control fm-control" name="fee_print_columns" placeholder="Fee Print Columns" [(ngModel)]="fee_print_columns">
+										</div>
+										 <div class="col-md-2 form-group modal_button" style="text-align:right;">
+											<label class="control-label ">&nbsp;</label>
+                                            <input type="submit" class="btn btn-info" style="margin-top:1.5em" [disabled]="!feeSettings.form.valid " value="Update">
+                                        </div>
+										</div>
+                                    
+								</div>
+								<div class="col-md-12 form-group">
+                                    <div class="col-md-12 form-group" style="text-align: center">
+                                        <span>
+										<h4> 
+											Fee Templates
+										</h4>
+                                        </span>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="row mt-3">
+                                            <div *ngFor="let item of fee_templates;let index = index" [class]="index%2==0 ? 'col-md-5 offset-md-1' : 'col-md-5'">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label style="font-size:0.8rem;" [for]="'template_'+item.template_id">Use this</label>
+                                                        &nbsp;&nbsp;<input (change)="fee_template_changed($event)" [checked]="template_id==item.template_id" [id]="'template_'+item.template_id" type="radio" name="fee_template" name="template_id" [value]="item.template_id">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <img style="width:100%;" [src]="baseURL+'/fee_templates/'+item.template_id+'.jpg'">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+									</div>
+								</div>
+                            </form>
+                        </ng-template>
+                    </ngb-tab>
+
+                </ngb-tabset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- *********************************** Modals **************************************** -->
+
+<!-- ******** Add Session ************ -->
+
+<ng-template #addNewSession let-modal>
+    <div class="modal-header">
+        <div style="text-align: center; ">
+            <h3>Add New Session</h3>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 ">
+
+
+                <form class="form-group" #addsession="ngForm" (ngSubmit)="onSubmitAddSession(addsession)">
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:0em;">
+							Session Name * <span style="color:red;" *ngIf="!pickedUname.valid && pickedUname.touched"><small> Session Name Required</small> </span>
+							</label>
+                        <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="session_name" placeholder="2018-2019" [(ngModel)]="session_name" #pickedUname="ngModel">
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:0em;">
+							Start Date * <span style="color:red;" *ngIf="!pickedSDate.valid && pickedSDate.touched"><small> Required</small> </span>
+						</label>
+                        <input type="date" required style="margin-top:0em;" class="form-control fm-control" name="s_date" [(ngModel)]="s_date" #pickedSDate="ngModel">
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:0em;">
+							End Date * <span style="color:red;"  *ngIf="!pickedEDate.valid && pickedEDate.touched"><small>Required</small> </span>
+						</label>
+                        <input type="date" required style="margin-top:0em;" class="form-control fm-control" name="e_date" [(ngModel)]="e_date" #pickedEDate="ngModel">
+                    </div>
+                    <div class="col-md-12 form-group modal_button" style="text-align:right;">
+                        <input type="submit" class="btn btn-info" style="margin-top:0 em" [disabled]="!addsession.form.valid " value="Add New Session">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-light" (click)="modal.close()">close</button>
+    </div>
+</ng-template>
+
+
+<!-- ******** Update Session ************ -->
+<ng-template #upd_SessionModal let-modal>
+    <div class="modal-header">
+        <div style="text-align: center; ">
+            <h3>Update Session</h3>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 ">
+
+
+                <form class="form-group" #upsession="ngForm" (ngSubmit)="onSubmitUpdateSession(upsession)">
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:0em;">Session Name </label>
+                        <input type="text" style="margin-top:0em;" class="form-control fm-control" name="session_name" [(ngModel)]="u_session_name">
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:0em;">
+							Start Date * <span style="color:red;" *ngIf="!pickedUSDate.valid && pickedUSDate.touched"><small>Required</small> </span>
+						</label>
+                        <input type="date" required style="margin-top:0em;" class="form-control fm-control" name="u_s_date" [(ngModel)]="u_s_date" #pickedUSDate="ngModel">
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="control-label" style="margin-top:0em;">
+							End Date * <span style="color:red;" *ngIf="!pickedUEDate.valid && pickedUEDate.touched"><small>Required</small> </span>
+						</label>
+                        <input type="date" required style="margin-top:0em;" class="form-control fm-control" name="u_e_date" [(ngModel)]="u_e_date" #pickedUEDate="ngModel">
+                        <input type="hidden" name="sess_id" [(ngModel)]="sess_id">
+                    </div>
+                    <div class="col-md-12 form-group modal_button" style="text-align:right;">
+                        <input type="submit" class="btn btn-info" style="margin-top:0 em" [disabled]="!upsession.form.valid " value="Update Session">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-light" (click)="modal.close()">close</button>
+    </div>
+</ng-template>
