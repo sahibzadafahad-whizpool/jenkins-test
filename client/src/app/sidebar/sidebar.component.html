@@ -1,0 +1,254 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+        <li class="nav-item nav-profile">
+            <div class="nav-link">
+                <div class="user-wrapper">
+                    <div class="profile-image">
+                        <img src="assets/images/faces/face1.png" alt="profile image">
+
+                    </div>
+                    <div class="text-wrapper">
+                        <p class="profile-name">{{ user_name }}</p>
+                        <div>
+                            <small class="designation text-muted">{{ user_type }}
+              </small>
+                            <span class="status-indicator online"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- <button class="btn btn-success btn-block">New Project
+          <i class="mdi mdi-plus"></i>
+        </button> -->
+            </div>
+        </li>
+
+        <li *ngIf="is_user_allowed('Parents')" class="nav-item">
+            <a class="nav-link" routerLink="/parents" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-human-male-female"></i>
+                <span class="menu-title">Parents</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Teachers')" class="nav-item">
+            <a class="nav-link" routerLink="/teachers" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-account-multiple"></i>
+                <span class="menu-title">Teachers</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Staff')" class="nav-item">
+            <a class="nav-link" routerLink="/staff" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-account-multiple"></i>
+                <span class="menu-title">Staff</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Classes')" class="nav-item">
+            <a class="nav-link" routerLink="/classes" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-home-variant"></i>
+                <span class="menu-title">Classes</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Sections')" class="nav-item">
+            <a class="nav-link" routerLink="/sections" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-television"></i>
+                <span class="menu-title">Sections</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Subjects')" class="nav-item">
+            <a class="nav-link" routerLink="/subjects" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-library-books"></i>
+                <span class="menu-title">Subjects</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Students')" class="nav-item">
+            <a class="nav-link" routerLink="/students" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-human-child"></i>
+                <span class="menu-title">Students</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#employee-attendance-dropdown" aria-expanded="false" aria-controls="employee-attendance-dropdown">
+              <i class="menu-icon mdi mdi-calendar-multiple-check"></i>
+              <span class="menu-title">Attendance</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="employee-attendance-dropdown">
+              <ul class="nav flex-column sub-menu">
+                
+                <li *ngIf="is_user_allowed('StudentAttendance')" class="nav-item">
+                    <a class="nav-link" routerLink="/attendance" routerLinkActive="active">
+                        <i class="menu-icon mdi mdi-calendar-multiple-check"></i>
+                        <span class="menu-title">Student Attendance</span>
+                    </a>
+                </li>
+                <li *ngIf="is_user_allowed('StudentAttendanceReport')" class="nav-item">
+                    <a class="nav-link" routerLink="/attendance-report" routerLinkActive="active">
+                        <i class="menu-icon mdi mdi-calendar-multiple"></i>
+                        <span class="menu-title">Student Attendance Report</span>
+                    </a>
+                </li>
+                
+                
+                <li *ngIf="is_user_allowed('TeacherAttendance')" class="nav-item">
+                    <a class="nav-link" routerLink="/mark-emp-attendance/teacher" routerLinkActive="active">
+                        <i class="menu-icon mdi mdi-calendar-multiple-check"></i>
+                        <span class="menu-title">Teacher Attendance</span>
+                    </a>
+                </li>
+
+                <li *ngIf="is_user_allowed('EmployeeAttendance')" class="nav-item">
+                    <a class="nav-link" routerLink="/mark-emp-attendance/employee" routerLinkActive="active">
+                        <i class="menu-icon mdi mdi-calendar-multiple-check"></i>
+                        <span class="menu-title">Employee Attendance</span>
+                    </a>
+                </li>
+
+                <li *ngIf="is_user_allowed('TeacherEmployeeAttendanceReport')" class="nav-item">
+                    <a class="nav-link" routerLink="/view-emp-attendance" routerLinkActive="active">
+                        <i class="menu-icon mdi mdi-calendar-multiple"></i>
+                        <span class="menu-title">Teacher/Employee Report</span>
+                    </a>
+                </li>
+              </ul>
+            </div>
+      </li>
+
+        <li *ngIf="is_user_allowed('Diary')" class="nav-item">
+            <a class="nav-link" routerLink="/diary" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-note-text"></i>
+                <span class="menu-title">Work Diary</span>
+            </a>
+        </li>
+
+        <li *ngIf="is_user_allowed('Exams')" class="nav-item">
+            <a class="nav-link" routerLink="/exams" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-file-outline"></i>
+                <span class="menu-title">Exams</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('ExamResults')" class="nav-item">
+            <a class="nav-link" routerLink="/marks" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-file"></i>
+                <span class="menu-title">Manage Exam Results</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Results')" class="nav-item">
+            <a class="nav-link" routerLink="/results" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-file"></i>
+                <span class="menu-title">Results</span>
+            </a>
+        </li>
+
+        <li *ngIf="is_user_allowed('Assignments')" class="nav-item">
+            <a class="nav-link" routerLink="/assignments" routerLinkActive="active">
+                <i class="menu-icon mdi  mdi-file-document"></i>
+                <span class="menu-title">Assignments</span>
+            </a>
+        </li>
+        <li *ngIf="is_user_allowed('Quizes')" class="nav-item">
+            <a class="nav-link" routerLink="/quizes" routerLinkActive="active">
+                <i class="menu-icon mdi  mdi-file-document"></i>
+                <span class="menu-title">Quizes</span>
+            </a>
+        </li>
+        
+        <li *ngIf="is_user_allowed('Expenses')" class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#expense-dropdown" aria-expanded="false" aria-controls="apps-dropdown">
+              <i class="menu-icon mdi mdi-cash-usd"></i>
+              <span class="menu-title">Expense / Income</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="expense-dropdown">
+              <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                      <a class="nav-link" routerLink="/expense" routerLinkActive="active">
+                          <i class="menu-icon mdi mdi-cash-usd"></i>
+                          <span class="menu-title">Expense / Income Heads</span>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/viewexpenses" routerLinkActive="active">
+                        <i class="menu-icon mdi mdi-cash-usd"></i>
+                        <span class="menu-title">Add Expense / Income</span>
+                    </a>
+                    </li>
+                  <li class="nav-item">
+                      <a class="nav-link" routerLink="/expensereports" routerLinkActive="active">
+                          <i class="menu-icon mdi mdi-cash-usd"></i>
+                          <span class="menu-title">Reports</span>
+                      </a>
+                  </li>
+                 
+              </ul>
+            </div>
+      </li>
+
+		<li *ngIf="is_user_allowed('Fee')" class="nav-item">
+              <a class="nav-link" data-toggle="collapse" href="#apps-dropdown" aria-expanded="false" aria-controls="apps-dropdown">
+                <i class="menu-icon mdi mdi-cash-usd"></i>
+                <span class="menu-title">Accounts</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="apps-dropdown" style="">
+                <ul class="nav flex-column sub-menu">
+					<li class="nav-item">
+						<a class="nav-link" routerLink="/fee-heads" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Fee Heads</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" routerLink="/fee-structure" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Fee Structure</span>
+						</a>
+					</li>
+				   <li class="nav-item">
+						<a class="nav-link" routerLink="/fee-voucher" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Create Fee voucher</span>
+						</a>
+					</li>
+					<li class="nav-item" *ngIf="admin_level==1 || admin_level==2">
+						<a class="nav-link" routerLink="/update-voucher" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Update Fee voucher</span>
+						</a>
+					</li>
+				   <li class="nav-item">
+						<a class="nav-link" routerLink="/fee-invoice" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Fee Submission Status</span>
+						</a>
+					</li>
+					<li class="nav-item" *ngIf="admin_level==1 || admin_level==2">
+						<a class="nav-link" routerLink="/previous-voucher" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Previous voucher</span>
+            </a>
+        </li>
+				  <li class="nav-item">
+						<a class="nav-link" routerLink="/fee-discounts" routerLinkActive="active">
+							<i class="menu-icon mdi mdi-cash-usd"></i>
+							<span class="menu-title">Scholarship/Discounts </span>
+						</a>
+					</li>
+					
+                </ul>
+              </div>
+		</li>
+        <li *ngIf="is_user_allowed('StudentPromotions')" class="nav-item">
+            <a class="nav-link" routerLink="/students-promotion" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-forward"></i>
+                <span class="menu-title">Student Promotions</span>
+            </a>
+        </li>
+
+        <li *ngIf="is_user_allowed('Suggestions')" class="nav-item">
+            <a class="nav-link" routerLink="/suggestions" routerLinkActive="active">
+                <i class="menu-icon mdi mdi-forward"></i>
+                <span class="menu-title">Suggestions</span>
+            </a>
+        </li>
+
+    </ul>
+</nav>

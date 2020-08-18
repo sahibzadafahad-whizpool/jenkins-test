@@ -1,0 +1,11 @@
+@media print {
+    .hide_on_print {
+        display: none;
+    }
+    .mini-heading {
+        margin-top: 6px !important;
+    }
+    .total_summary {
+        padding-left: 0em;
+    }
+}

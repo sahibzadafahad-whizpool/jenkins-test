@@ -1,0 +1,148 @@
+<style>
+    .nav-tabs .nav-item .nav-link {
+        padding: 13px 16px;
+    }
+	.card .card-body{padding:1rem 1rem !important;}
+	
+	
+</style>
+<div class="row">
+    <div class=" grid-margin stretch-card col-lg-12">
+        <div class="card">
+            <div class="card-body">
+				<div class="col-lg-12">
+					<h4 class="card-title text-center">Search Previous Voucher for : <b>{{selected_class_name}}</b></h4>
+				</div>
+				<div class="row">
+					
+					<div class="col-md-12" style="background:#a7eaf5;text-center">	
+							<form #searchClassFee="ngForm" (ngSubmit)="onClickSearchClassFee(searchClassFee)" class="form-groupx ">
+							<div class="row">
+								<div class="col-md-2 form-group" ></div>
+								<div class="col-md-4 form-group" >
+									<p *ngIf="!selectClass.valid && selectClass.touched " class="alert alert-danger " style="margin-top:1em; margin-left:0em; "> Class is required!
+									</p>
+									<label class="control-label "><b>Class *</b></label>
+									<select #selectClass="ngModel" class="form-control fm-control" required style="margin-top:0em;" #selectedClass [(ngModel)]="class_id"
+										(change)=classSelected(selectedClass.value); name="class_id">
+										<option [ngValue]="undefined" disabled>Select Class </option>
+										<option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}</option>
+									</select>
+								</div>
+								<div class="col-md-3 form-group" >
+									<p *ngIf="!selectMonth.valid && selectMonth.touched " class="alert alert-danger " style="margin-top:1em; margin-left:0em; "> Month is required! </p>
+									<label class="control-label "><b>Month *</b></label>
+									<select #selectMonth="ngModel" class="form-control fm-control" required style="margin-top:0em;" #selectedMonth [(ngModel)]="month_id" name="month_id">
+										<option [ngValue]="undefined" disabled>Select Month </option>
+										<option *ngFor="let item of monthNames" [value]="item.id">{{item.name}}</option>
+									</select>
+								</div>
+								
+								<div class="col-md-2 form-group" >		
+									<label class="control-label "> &nbsp; &nbsp; </label><br/>
+									<input type="submit" [disabled]="!searchClassFee.form.valid" class="btn btn-info " value="Search ">
+								</div>
+							</div>
+						</form>	
+					</div>	
+					
+				</div>	
+				<div class="row">
+						<div id="no-more-tables" class=" col-lg-12 p-0" >
+						<form class="form-group" #updateFee="ngForm">
+						
+							<table class="table table-striped table-bordered table-sm" cellspacing="0">
+								<thead class="thead-dark  ">
+									<tr>
+										<th>Admission#</th>
+										<th>Student</th>
+										<th>Class</th>
+										<th>Section</th>
+										<th>Tuition Fee</th>
+										<th>Discount</th>
+										<th *ngFor="let item of feeheadList ">{{ item.head_name }}</th>
+										<th>On Due Date</th>
+										<th>Late Fee</th>
+										<th>Paid Amount</th>
+										<th>Paid</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr *ngFor="let item of voucher_data let index = index">
+										
+										<td title="Admission#.">{{item.roll_num}}</td>
+										<td title="Student">{{item.std_name}}.</td>
+										<td title="Class">{{item.class_name}}</td>
+			 							<td title="Section" >{{item.section_name}}</td>
+										<td title="Tuition Fee" >{{item.fee}}</td>
+										<td title="Discount" >{{classInvoiceData[item.std_id].discount_amount}}</td>
+										<td *ngFor="let head of feeheadList let ind = ind" title={{head.head_name}}>
+											<label>{{item['heads'][head.fee_heads_id]}}</label>
+										</td>
+										<td title="On Due Date" >{{item.dueDate}}</td>										
+										<td title="Late Fee"  >										
+											<ng-template [ngIf]="classInvoiceData[item.std_id].is_writeoff">0</ng-template>
+											<ng-template [ngIf]="classInvoiceData[item.std_id].late_fee">{{classInvoiceData[item.std_id].late_fee}}</ng-template>
+											<ng-template [ngIf]="!classInvoiceData[item.std_id].is_writeoff && !classInvoiceData[item.std_id].late_fee">{{lateFee}}</ng-template>
+										</td>
+										<td title="Paid Amount" >{{classInvoiceData[item.std_id].amount_paid}}</td>
+										<td title="Paid" class="text-capitalize" >
+											<strong>
+											  <span
+												[style.color]="classInvoiceData[item.std_id].fee_status == 'paid' ? 'red': (classInvoiceData[item.std_id].fee_status == 'paid' ? 'green' : 'brown')">
+												{{classInvoiceData[item.std_id].fee_status}}
+											  </span>
+											</strong>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</form>	
+					
+						</div>	
+				</div>
+			</div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Modal on Page Load -->
+<ng-template #searchStudentFee>
+    <div class="modal-header ">
+        <div style="text-align: center ">
+            <h3>Voucher List</h3>
+        </div>
+        <!--
+        <button type="button " class="close " aria-label="Close "> 
+        <span aria-hidden="true ">&times;</span>
+        </button>
+        -->
+    </div>
+    <form #searchClassFee="ngForm" (ngSubmit)="onClickSearchClassFee(searchClassFee)" class="form-group ">
+        <div class="modal-body ">
+            <p *ngIf="!selectClass.valid && selectClass.touched " class="alert alert-danger " style="margin-top:1em; margin-left:0em; ">
+                Class is required!
+            </p>
+            <label class="control-label "> Class * </label>
+			<select #selectClass="ngModel" class="form-control fm-control" required style="margin-top:0em;" #selectedClass [(ngModel)]="class_id"
+				(change)=classSelected(selectedClass.value); name="class_id">
+				<option [ngValue]="undefined" disabled>Select Class </option>
+				<option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}</option>
+			</select>
+			<!--
+            <p *ngIf="!selectSection.valid && selectSection.touched " class="alert alert-danger " style="margin-top:1em; margin-left:0em; ">
+                Section is required!
+            </p>
+            <label class="control-label "> Section * </label>
+			<select class="form-control fm-control"  #selectSection="ngModel" style="margin-top:0em;" [(ngModel)]="section_id"
+				#selectedSection  name="section_id">
+				<option [ngValue]="undefined" disabled>Select Section</option>
+				<option *ngFor="let item of sectionData" [value]="item.section_id">{{item.section_name}}</option>
+			</select>
+			-->
+        </div>
+        <div class="modal-footer ">
+            <input type="submit" [disabled]="!searchClassFee.form.valid" class="btn btn-info " value="Search ">
+        </div>
+    </form>
+</ng-template>

@@ -1,0 +1,163 @@
+<div class="row">
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+        <div class="card card-statistics">
+            <div class="card-body">
+                <div class="clearfix">
+                    <div class="float-left">
+                        <i class="mdi mdi-human-child text-danger icon-lg"></i>
+                    </div>
+                    <div class="float-right">
+                        <p class="mb-0 text-right">Total Students</p>
+                        <div class="fluid-container">
+                            <h3 class="font-weight-medium text-right mb-0">{{totalStudents}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 mb-0" (click)="redirect('students')" style="cursor:pointer;">
+                    <i class="mdi mdi-forward mr-1" aria-hidden="true"></i> View Details
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+        <div class="card card-statistics">
+            <div class="card-body">
+                <div class="clearfix">
+                    <div class="float-left">
+                        <i class="mdi mdi-account-multiple text-warning icon-lg"></i>
+                    </div>
+                    <div class="float-right">
+                        <p class="mb-0 text-right">Total Teachers</p>
+                        <div class="fluid-container">
+                            <h3 class="font-weight-medium text-right mb-0">{{totalTeachers}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 mb-0" (click)="redirect('teachers')" style="cursor:pointer;">
+                    <i class="mdi mdi-forward mr-1" aria-hidden="true"></i> View Details
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+        <div class="card card-statistics">
+            <div class="card-body">
+                <div class="clearfix">
+                    <div class="float-left">
+                        <i class="mdi mdi mdi-human-male-female text-success icon-lg"></i>
+                    </div>
+                    <div class="float-right">
+                        <p class="mb-0 text-right">Total Parents</p>
+                        <div class="fluid-container">
+                            <h3 class="font-weight-medium text-right mb-0">{{totalParents}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 mb-0" (click)="redirect('parents')" style="cursor:pointer;">
+                    <i class="mdi mdi-forward mr-1" aria-hidden="true"></i> View Details
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+        <div class="card card-statistics">
+            <div class="card-body">
+                <div class="clearfix">
+                    <div class="float-left">
+                        <i class="mdi mdi-home-modern text-info icon-lg"></i>
+                    </div>
+                    <div class="float-right">
+                        <p class="mb-0 text-right">Total Classes </p>
+                        <div class="fluid-container">
+                            <h3 class="font-weight-medium text-right mb-0">{{totalClasses}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 mb-0" (click)="redirect('classes')" style="cursor:pointer;">
+                    <i class="mdi mdi-forward mr-1" aria-hidden="true"></i> View Details
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+        <div class="card card-statistics">
+            <div class="card-body">
+                <div class="clearfix">
+                    <div class="float-left">
+                        <i class="mdi mdi-school text-success icon-lg"></i>
+                    </div>
+                    <div class="float-right">
+                        <p class="mb-0 text-right">Total Sections </p>
+                        <div class="fluid-container">
+                            <h3 class="font-weight-medium text-right mb-0">{{totalSections}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 mb-0" (click)="redirect('sections')" style="cursor:pointer;">
+                    <i class="mdi mdi-forward mr-1" aria-hidden="true"></i> View Details
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+        <div class="card card-statistics">
+            <div class="card-body">
+                <div class="clearfix">
+                    <div class="float-left">
+                        <i class="mdi mdi-account-location text-primary icon-lg"></i>
+                    </div>
+                    <div class="float-right">
+                        <p class="mb-0 text-right">Total Users </p>
+                        <div class="fluid-container">
+                            <h3 class="font-weight-medium text-right mb-0">{{totalUsers}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-muted mt-3 mb-0" (click)="redirect('users')" style="cursor:pointer;">
+                    <i class="mdi mdi-forward mr-1" aria-hidden="true"></i> View Details
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Recent Announcements</h5>
+                <div class="fluid-container">
+                    <div class="row ticket-card mt-3 pb-2 border-bottom pb-3 mb-3" *ngFor="let item of activeAnnouncementDetails ">
+                        <div class="ticket-details col-md-9">
+                            <div class="d-flex">
+                                <p class="text-dark font-weight-semibold mr-2 mb-0 no-wrap">{{item.announc_title}} :</p>
+
+                            </div>
+                            <p class="text-gray ellipsis mb-2">{{item.announc_details}}</p>
+                            <div class="row text-gray d-md-flex d-none">
+                                <div class="col-4 d-flex">
+                                    <small class="mb-0 mr-2 text-muted text-muted">Announcement Date:</small>
+                                    <small class="Last-responded mr-2 mb-0 text-muted text-muted">{{ item.announcement_date * 1000 | date}}</small>
+                                </div>
+                                <div class="col-4 d-flex">
+                                    <small class="mb-0 mr-2 text-muted text-muted">Expires at :</small>
+                                    <small class="Last-responded mr-2 mb-0 text-muted text-muted">{{ item.announcement_expire * 1000 | date }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ticket-actions col-md-2">
+                            <div class="btn-group dropdown">
+                                <button type="button" class="btn btn-success  btn-sm" (click)="redirect('announcements')">
+                  Details
+                </button>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

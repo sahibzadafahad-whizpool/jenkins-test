@@ -1,0 +1,307 @@
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-body">
+
+                <h4 class="card-title">Quizes Information</h4>
+
+
+                <div class="row">
+                    <div class="pull-right col-lg-12">
+                        <div class="col-lg-3 pull-right " style="padding-bottom: 1.5em;">
+
+                            <button _ngcontent-c2="" (click)="openNgModal(addQuizModel ,'lg')" class="btn btn-success btn-block">New
+                Quiz
+                <i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12 col-md-12">
+                        <hr>
+                        <form style="margin-top:2em;" class="form-group" #Quizes="ngForm" (ngSubmit)="submitgetQuizes(Quizes)">
+                            <div class="row">
+
+                                <div class="col-md-4 form-group">
+                                    <label class="control-label"> Class *</label>
+                                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedgCLass.valid && pickedgCLass.touched"><small>Class
+                      Required</small></span>
+                                    <select class="form-control fm-control" style="margin-top:0em;" #pickedgCLass [(ngModel)]="g_class_id" (change)="getSectionByClassID(pickedgCLass.value)" name="g_class_id">
+                    <option [ngValue]="undefined" disabled>Select Class</option>
+                    <option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}</option>
+                  </select>
+
+                                </div>
+
+                                <div class="col-md-4 form-group">
+                                    <label class="control-label"> Section *</label>
+                                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedgSection.valid && pickedgSection.touched"><small>Section
+                      Required</small></span>
+                                    <select class="form-control fm-control" style="margin-top:0em;" #pickedgSection [(ngModel)]="g_section_id" (change)="sectionSelectedF(pickedgSection.value)" name="g_section_id">
+                    <option [ngValue]="undefined" disabled>Select Section</option>
+                    <option *ngFor="let item of sectionsList" [value]="item.section_id">{{item.section_name}}</option>
+                  </select>
+
+                                </div>
+
+                                <div class="col-md-4 form-group">
+                                    <label class="control-label" style="margin-top:0em;"> Subject * </label>
+                                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedUSubject.valid && pickedUSubject.touched"><small>Subject
+                      required</small></span>
+
+                                    <select class="form-control fm-control" style="margin-top:0em;" #pickedUSubject [(ngModel)]="g_subject_id" (change)=funSelectedSub(pickedUSubject.value) name="g_subject_id">
+                    <option [ngValue]="undefined" disabled>Select Subject</option>
+                    <option *ngFor="let item of cSubjectsList" [value]="item.subject_id + '-' + item.subject_type">
+                      {{item.subject_name}}</option>
+                  </select>
+                                </div>
+
+                                <div class="col-md-12 form-group" style="text-align: center">
+                                    <input type="submit" class="btn btn-info" style="margin-top:1em" [disabled]="!Quizes.form.valid || disableBtn" value="List Quizes">
+
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="row" *ngIf="showtable">
+
+                    <div class="col-lg-12 col-md-12">
+
+                        <div style="text-align: center;" class="mini-heading">
+                            <h3> List Quiz Details</h3>
+                            <h4>
+                                Class : {{selectedClassName}}
+                            </h4>
+                            <h4> Section : {{selectedClsSection}}
+                            </h4>
+                        </div>
+                        <hr>
+                        <div style="height:50px;">
+
+                        </div>
+
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Quiz Title</th>
+                                    <th>Description</th>
+                                    <th>Subject </th>
+                                    <th> Quiz Date</th>
+                                    <th> Total Marks</th>
+                                    <th> Actions</th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of quiz_Data | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+
+                                    <td>{{index + 1}}</td>
+                                    <td>{{ item .quiz_title}}</td>
+                                    <td>{{ item .description}}</td>
+                                    <td>{{item.subject_name}}</td>
+                                    <td>{{item.quiz_date * 1000 | date}}</td>
+                                    <td>{{item.quiz_t_marks}}</td>
+
+
+                                    <td> <label style="cursor: pointer;" (click)="updateQuizModal(updateQuizModel,item.quiz_id)" class="badge badge-info">Update Marks </label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- *********************************** Modals **************************************** -->
+
+
+<!-- ******** Add Quiz ************ -->
+
+
+<ng-template #addQuizModel let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Add Quiz</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+
+    <form class="form-group" #addQuiz="ngForm" (ngSubmit)="onClickAddQuiz(addQuiz)">'
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label class="control-label"> Class *</label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedCLass.valid && pickedCLass.touched"><small>Class
+              Required</small></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" #pickedCLass [(ngModel)]="classid" (change)=classSelected(pickedCLass.value); name="classid">
+            <option [ngValue]="undefined" disabled>Select Class</option>
+            <option *ngFor="let item of classdataList" [value]="item.class_id">{{item.class_name}}</option>
+          </select>
+
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label"> Section *</label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedSection.valid && pickedSection.touched"><small>Section
+              Required</small></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" #pickedSection [(ngModel)]="sectionid" (change)="sectionSelectedF(pickedSection.value)" name="sectionid">
+            <option [ngValue]="undefined" disabled>Select Section</option>
+            <option *ngFor="let item of sectionsList" [value]="item.section_id">{{item.section_name}}</option>
+          </select>
+
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;"> Subject * </label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedSubject.valid && pickedSubject.touched"><small>Subject
+              required</small></span>
+
+                    <select class="form-control fm-control" style="margin-top:0em;" #pickedSubject [(ngModel)]="subjectid" (change)=funSelectedSub(pickedSubject.value) name="subjectid">
+            <option [ngValue]="undefined" disabled>Select Subject</option>
+            <option *ngFor="let item of cSubjectsList" [value]="item.subject_id + '-' + item.subject_type">{{item.subject_name}}
+
+            </option>
+          </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Quiz Title * <span style="color:red;"
+              *ngIf="!pickedassign.valid && pickedassign.touched"><small>
+                Required</small> </span></label>
+                    <input type="text" required style="margin-top:0em;" class="form-control fm-control" name="title" placeholder="Quiz Title" [(ngModel)]="title" #pickedassign="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Quiz Description <span style="color:red;"
+              *ngIf="!pickedQuizDesc.valid && pickedQuizDesc.touched"><small>
+                Required</small> </span></label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="description" placeholder="Quiz Description" [(ngModel)]="description" #pickedQuizDesc="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Quiz Date * <span style="color:red;"
+              *ngIf="!pickeddueDate.valid && pickeddueDate.touched"><small>
+                Quiz Date Required</small> </span></label>
+                    <input type="date" required style="margin-top:0em;" class="form-control fm-control" name="quizDate" placeholder="Name" [(ngModel)]="quizDate" #pickeddueDate="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;">Total Marks * <span style="color:red;"
+              *ngIf="!pickedTM.valid && pickedTM.touched"><small>
+                Marks Required</small> </span></label>
+                    <input type="number" required style="margin-top:0em;" class="form-control fm-control" name="quiz_t_marks" placeholder="Total Marks" [(ngModel)]="quiz_t_marks" #pickedTM="ngModel">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:0em;"> Quiz Images <span style="color:red;">
+            </span></label>
+                    <input id="quiz_image" #imageFile accept="image/*" name="quiz_image" type="file" (change)="fileChangeEvent($event)" class="form-control fm-control" placeholder="Upload a file..." multiple />
+                </div>
+
+                <div class="col-md-12 form-group  modal_button" style="text-align:right;">
+
+
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-info" [disabled]="!addQuiz.form.valid || disableBtn" value="Add Quiz">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </form>
+</ng-template>
+
+
+
+<!-- ******** Update Student Quiz marks ************ -->
+
+
+<ng-template #updateQuizModel let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Update Quiz Marks </h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+
+                    <th>Roll Num</th>
+                    <th>Name </th>
+                    <th>Total Marks</th>
+                    <th>Obtained Marks</th>
+                    <!-- <th> Quiz Pictures</th> -->
+                    <!-- <th>Upload Pictures</th> -->
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr *ngFor="let item of std_quizDetails | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+
+
+                    <td>{{item.roll_num}}</td>
+                    <td>{{item.std_name}}</td>
+                    <td>{{item.quiz_t_marks}}</td>
+                    <td><input type="number" name="obt_marks" #obtAssignMarks [(ngModel)]="item.obtained_marks" (change)="updateStdQuizMarks(obtAssignMarks.value, item.quiz_id,item.std_id)"></td>
+                    <!-- <td> -->
+                    <!-- <input type="file" class="form-control fm-control"> -->
+                    <!-- <label style="cursor: pointer;" (click)="addStdAssignMarks(item.assign_id,item.std_id,obtAssignMarks.value , obtComment.value , submitDate.value)" class="badge badge-info">Update </label> -->
+                    <!-- </td> -->
+
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>
+
+
+
+
+
+
+<!-- ******** Upload Quiz  ************ -->
+
+
+
+<ng-template #uploadQuizModal let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Update Assignment Marks </h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <input id="cin" name="cin" type="file" (change)="fileChangeEvent($event)" placeholder="Upload a file..." multiple />
+
+        <button type="button" class="btn btn-success btn-s" (click)="upload()">
+      <i class="glyphicon glyphicon-open-file"></i>&nbsp;Upload
+    </button>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

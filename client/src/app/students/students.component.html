@@ -1,0 +1,1190 @@
+<div class="row">
+
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+
+
+                <div class="row">
+
+                    <div class="col-lg-9 col-md-9">
+                        <h4 class="card-title">Student Details</h4>
+                    </div>
+
+                    <div class="col-lg-3  " style="padding-bottom: 1.5em;">
+
+                        <button _ngcontent-c2="" (click)="prepare_add_student_model(addStudentModal)" class="btn btn-success btn-block">New
+              Student
+              <i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+                    </div>
+                </div>
+
+
+
+
+                <div class="table-responsive" style="overflow-x: hidden;">
+
+                    <div class="row">
+                        <!-- ******** side bar **** -->
+                        <div class="col-lg-3 col-md-3">
+                            <div class="list-group" style="padding-top: 0px; width: -webkit-fill-available;">
+
+                                <p class="list-group-item mini-sidebar">
+                                    <i class="fa fa-university"></i>
+                                    <span> Select Class</span>
+                                </p>
+                                <a *ngFor="let item of classDataList " class="list-group-item" style="cursor: pointer;" class="list-group-item" [style.background-color]="item.BackgroundColour" [style.color]="item.color" (click)="onClickSideBar(item.class_id , item)">
+                                    <span>{{item.class_name}}</span>
+                                </a>
+
+
+                            </div>
+                        </div>
+                        <div class="col-lg-9 col-md-9">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <!-- <div style="text-align: center">
+                                    <div class="mini-heading ">
+                                        <h3> {{selectedClassName}} {{studentdetailNoti}} {{ available}}</h3>
+                                    </div>
+                                </div> -->
+
+                                <div class="row" style="margin-top: 2em; margin-bottom: 0em; padding-bottom: 1.5em; padding-top: 0em;">
+                                    <div class="col-lg-4" *ngIf="showfilter">
+                                        <!-- Search Student -->
+                                        <!-- <input class="form-control fm-control" [(ngModel)]="searchText" placeholder="Roll Num / Student Name"> -->
+
+
+                                        <label class="control-label">Filter By Section</label>
+
+                                        <select class="form-control fm-control" (change)=filterStudentBySection(pickedSection.value); required style="margin-top:0em;" #pickedSection [(ngModel)]="section_id" name="section_id">
+
+                                        <option value="all" selected>All Sections </option>
+                                        <option *ngFor="let section of sectionsData ; let index = index" [value]="section.section_name">
+                                          {{ section.section_name}}
+                                        </option>
+                                      </select>
+
+
+                                    </div>
+                                    <div class="col-lg-3">
+
+                                    </div>
+                                    <!-- <div class="col-lg-4">
+
+                                        Filter By Section
+                                        <select class="form-control fm-control" (change)=getSelectedSectionDetails(pickedSection.value); required style="margin-top:0em;" #pickedSection [(ngModel)]="section_id" name="classid">
+
+                                        <option value="all" selected>All Sections </option>
+                                        <option *ngFor="let section of sectionOptions ; let index = index" [value]="index">
+                                          {{ section.section_name}}
+                                        </option>
+                                      </select>
+
+                                    </div> -->
+
+
+                                </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th> S.No</th>
+                                            <th> Student </th>
+                                            <th>Roll Number</th>
+                                            <th>Student Name </th>
+                                            <th>Section Name</th>
+                                            <th>Actions</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of studentsDataList let index = index">
+
+                                            <td>{{index + 1}}</td>
+                                            <td> <img [src]="item.thumb_path == '' || null ?  placeholder : item.thumb_path" class="rounded-circle dropdown-toggle" width="30px" data-toggle="dropdown" alt="avatar" onError="this.src='assets/images/teacherplaceholder.png'"
+                                                    style=" border-radius: 50%; cursor:pointer;" (click)="openProfileStudModal(studentProfileModel,item.student_id,item.class_id)">
+
+
+
+                                            </td>
+                                            <td>{{item.roll_num}}</td>
+                                            <td>{{item.std_name}}</td>
+
+                                            <td>{{item.section_name}}</td>
+
+
+                                            <td>
+
+
+                                                <label class="badge badge-info" *ngIf="(admin_level == 1)" style="cursor: pointer;" (click)=openEditStudModal(updateStudentModal,item.student_id,item.class_id)>Edit</label>
+                                                <label class="badge badge-danger" *ngIf="(admin_level == 1)" style="cursor: pointer; margin-left: 1em;" (click)=onClickdeleteStudent(item.student_id,item.class_id)>Delete</label>
+
+                                                <label class="badge badge-primary" style="cursor: pointer; margin-left: 1em;" (click)="openProfileStudModal(studentProfileModel,item.student_id,item.class_id)">Profile</label>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="studentsDataList && !studentsDataList.length">
+                                            <td colspan="6">No students exist in selected class</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- *********************************** Modals **************************************** -->
+
+
+<!-- ********student Profile Model ************ -->
+
+<ng-template #studentProfileModel let-modal>
+
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Student Profile</h3>
+
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-3">
+                <div class="card">
+                    <div class="profile-wrap animated fadeIn">
+                        <div class="info-wrap">
+                            <div class="avatar-wrap">
+                                <img [src]="avatarImgSrc == '' || avatarImgSrc==null ?  'assets/images/placeholder.png' : avatarImgSrc" alt="Profile Picture Not Found!" style="margin: 1.1em; width: 14.5em;" onError="this.src='assets/images/placeholder.png';">
+                            </div>
+                            <!-- <div style="margin: 1.1em;">
+                                <span class="user-name">{{userPost}}</span>
+                            </div> -->
+                        </div>
+                        <div class="profile-foot" style="margin: 1.1em;">
+                            <h4>Name : {{std_name}} </h4>
+
+                            <h4>Class : {{class_name}} | Section : {{section_name}}</h4>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-9 col-md-9 col-sm-10">
+                <ngb-tabset class="tab-solid tab-solid-primary">
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            Basic Info
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <button style="margin-top: -3rem;" *ngIf="admin_level==1" (click)="modal.close('Close click');openEditStudModal(updateStudentModal,student_id,class_id)" class="btn btn-sm btn-info">Edit</button>
+                            <div class="card" style="margin-top: -0.5rem;">
+
+                                <table class="table table-hover">
+
+                                    <tbody>
+                                        <tr>
+                                            <td> <strong>Roll Number : </strong> {{ std_rollNum }} </td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Student Name : </strong> {{std_name}} </td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Date Of Birth :  </strong> {{std_dob}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Gender :  </strong> {{std_gender}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Phone Number :  </strong> {{std_phonenum}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Emergency Number :  </strong> {{std_emergency_number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Address 1 : </strong> {{std_address_1}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Address 2 : </strong> {{std_address_2}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> B-Form Number :  </strong> {{std_bform_number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong> Email : </strong>{{std_email}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Previous School : </strong>{{ std_prevSchool }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Transport : </strong>{{ std_transport ? 'No' : 'Yes' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Hostel : </strong>{{ std_hostel ? 'No' : 'Yes' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Medical Problem : </strong>{{ student_medicalproblem }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Disability Problem : </strong>{{ student_disablityproblem }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Comments : </strong>{{ student_comment }}</td>
+                                        </tr>
+                                        <!-- <tr>
+                                            <td><strong> Class : </strong> {{class_name}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Section : </strong> {{section_name}}</td>
+                                        </tr> -->
+
+                                       
+                                        <tr>
+                                            <td> <strong> Religion : </strong> {{std_religion}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Blood Group : </strong> {{std_blood_group}}</td>
+                                        </tr>
+
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </ng-template>
+                    </ngb-tab>
+
+
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            Parent Info
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <button style="margin-top: -3rem;" *ngIf="admin_level==1" (click)="modal.close('Close click');prepare_edit_parent_modal(AddParentModal)" class="btn btn-sm btn-info">Edit</button>
+                            <div class="card" style="margin-top: -0.5rem;">
+
+                                <table class="table table-hover">
+
+
+                                    <tbody>
+                                        <tr>
+                                            <td> <strong>Father Name : </strong> {{father_name}} </td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong>Relation With Student : </strong> {{primary_parent_type}} </td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong>Parent Name : </strong> {{parent_name}} </td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Parent Email : </strong> {{parent_email}} </td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong>Phone Number : </strong> {{parent_number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong>Second Phone Number : </strong> {{parent_sec_phoneNum}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> CNIC : </strong>{{parent_cnic}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Address : </strong> {{parent_address}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Profession : </strong>{{parent_profession}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Income : </strong> {{parent_income}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td> <strong> Education : </strong> {{parent_education}}</td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </ng-template>
+                    </ngb-tab>
+
+
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            Exam Marks
+                        </ng-template>
+                        <ng-template ngbTabContent>
+
+
+                            <div class="card">
+                                <form style="margin-top:2em;" class="form-group" #manageMarks="ngForm" (ngSubmit)="submitExamIdF(manageMarks)">
+
+                                    <div class="col-md-12 form-group">
+                                        <label class="control-label"> Select Exam *</label>
+                                        <span style="color:red; margin-left: 1em;" *ngIf="!pickedExam.valid && pickedExam.touched"><small>Exam
+                      Required</small></span>
+                                        <select class="form-control fm-control" required style="margin-top:0em;" #pickedExam [(ngModel)]="exam" name="exam">
+                    <option [ngValue]="undefined" disabled>Select Exam</option>
+                    <option *ngFor="let item of examsDataList" [value]="item.exam_id">{{item.exam_name}}</option>
+                  </select>
+                                    </div>
+                                    <div class="col-md-12 form-group" style="text-align: center">
+                                        <input type="submit" class="btn btn-info" style="margin-top:1em" [disabled]="!manageMarks.form.valid" value="Show Exam result ">
+
+                                    </div>
+
+                                </form>
+                                <div *ngIf="resultSummary" id="marksheet">
+
+                                    <div style="text-align: center;">
+                                        <h3 style="margin:1em">{{selected_exam | titlecase}} Result </h3>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Total Marks</th>
+                                                    <th>Obtained Marks</th>
+                                                    <th>Percentage</th>
+
+                                                    <th>Exam Date</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let item of studentExamResult; let index = index">
+
+
+                                                    <td>{{item.subject_name}}</td>
+                                                    <td>{{item.total_marks}}</td>
+                                                    <td>{{item.obtained_marks}}</td>
+
+
+                                                    <td> {{ item.obtained_marks/item.total_marks | percent:'2.0-1' }}</td>
+                                                    <td>{{item.exam_date * 1000 | date}}</td>
+
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div *ngIf="resultSummary" style="margin : 2em 1em;">
+                                        <h5> Total Marks: {{result_totalMarks}}</h5>
+                                        <h5>Obtained Marks :{{ result_obtainedMarks }}</h5>
+                                        <h5> Percentage {{ result_obtainedMarks/result_totalMarks | percent:'2.0-1' }}</h5>
+                                    </div>
+
+
+                                </div>
+
+                                <div *ngIf="printButton" style="margin-left: 1em;">
+                                    <button printTitle="Student Result" class="btn btn-info" [useExistingCss]="true" printSectionId="marksheet" ngxPrint>print</button>
+                                </div>
+
+                            </div>
+
+                        </ng-template>
+                    </ngb-tab>
+
+                    <ngb-tab>
+                        <ng-template ngbTabTitle>
+                            Fee Details
+                        </ng-template>
+                        <ng-template ngbTabContent>
+
+
+                            <div class="card">
+                                <div style="text-align: center" *ngIf="feedetailsPresent">
+                                    <span style="color: red ; margin-left:2em;"> No
+                  Fee Details Availabale
+                </span>
+                                </div>
+
+                                <table class="table table-hover">
+                                    <thead class="thead-light">
+                                        <tr>
+
+                                            <th>Fee Month</th>
+                                            <th>Last Date</th>
+                                            <th>Paid Date</th>
+                                            <th>Total </th>
+                                            <th>Paid Amount</th>
+                                            <th>Status</th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of studentFeeHistroyList; let index = index">
+
+
+                                            <td>{{item.fee_month * 1000 | date: 'MM/yyyy'}}</td>
+
+                                            <td>{{item.duedate_timestamp * 1000 | date}}</td>
+                                            <td>{{ !item.feepaid_date ? '-' : item.feepaid_date * 1000 | date}}</td>
+                                            <td>{{item.total_fee}}</td>
+                                            <td>{{item.amount_paid}}</td>
+
+                                            <td>{{ item.fee_status}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </ng-template>
+                    </ngb-tab>
+                </ngb-tabset>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>
+
+
+
+<!--************** add student information  *************-->
+
+<ng-template #addStudentModal let-modal>
+    <div class="modal-header">
+        <div style="text-align: center;width:100%;">
+            <h3>Add Student Information</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <form class="form-group" #addstudent="ngForm" (ngSubmit)="onSubmitAddStd(addstudent)">
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 note_background ">
+                    <span class="warning"><b> Admission New Students Note:</b> <br>
+            Admitting new students will automatically create an enrollment to the selected class / section in the
+            running
+            session. Please check the informations you have inserted because once you admit new student,
+            you won't be able to edit his/her class,roll number,section .
+          </span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:1.5em;">Student Name *</label>
+                    <span style="color:red;  margin-left: 1em;" *ngIf="!pickedStdNameI.valid && pickedStdNameI.touched"><small>
+                Student Name Required</small> </span>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_name" placeholder="Student Name" required [(ngModel)]="stud_name" #pickedStdNameI="ngModel">
+                </div>
+
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:1.4em;">Date Of Birth *</label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdDOBI.valid && pickedStdDOBI.touched"><small>DOB
+                Required</small></span>
+                    <input type="date" style="margin-top:0em;" class="form-control fm-control" name="stud_dob" required [(ngModel)]="stud_dob" #pickedStdDOBI="ngModel">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:1.4em;">Gender *</label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdGenderI.valid && pickedStdGenderI.touched"><small>Gender
+                Required</small></span>
+                    <select class="form-control fm-control" required style="margin-top:0em;" [(ngModel)]="stud_gender" name="stud_gender" #pickedStdGenderI="ngModel">
+                        <option [ngValue]="undefined" disabled>Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:1.4em;">Religion</label>
+
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_religion" placeholder="Religion" [(ngModel)]="stud_religion">
+                </div>
+
+                
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Parent Name</label>
+                    <input disabled type="text" style="margin-top:0em;" class="form-control fm-control" name="parentGuardianName" placeholder="" [(ngModel)]="parentGuardianNameText" #parentGuardianName="ngModel">
+                </div>
+
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Parent CNIC Number *</label>
+                    <span [style.color]="alert_color"><small style="margin-left: 1em;">{{ verify_parent_cnic_msg }} </small>  </span>
+                    
+                    <div class="input-group">
+                        <input [disabled]="this.showVerifyButton" type="number" value="{{parent_cnic}}" style="margin-top:0em;" class="form-control fm-control" name="stud_parentCnicNumber" placeholder="Parent CNIC Number " required [(ngModel)]="stud_parentCnicNumber" #pickedpID="ngModel">
+                    
+                        <div *ngIf="this.showVerifyButton" (click)="prepare_edit_parent_modal(AddParentModal)" class="input-group-append">
+                            <span type="button" class="input-group-text pt-0 pb-0"><span style="font-weight: bold;">view</span></span>
+                        </div>
+                    </div>
+
+                    
+
+                </div>
+
+                <div class="col-md-4 form-group text-left" style="margin-top: 2.1em;">
+                    
+                    <button type="button" [hidden]="!this.showVerifyButton" class="btn btn-warning" (click)=onChangecheckParentGuardianCnic()>Change Parent</button>
+
+                    <button type="button" [hidden]="this.showVerifyButton" class="btn btn-warning" (click)=onClickcheckParentGuardianCnic(this.stud_parentCnicNumber)>Verify</button>
+                    <button type="button" [hidden]="this.showVerifyButton" type="button" (click)="prepare_add_parent_modal(AddParentModal)" class="btn ml-1 btn-success">Add Parent <i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+                    
+                    <!-- <button type="button" [hidden]="!this.showEditParentButton" (click)="prepare_edit_parent_modal(AddParentModal)" class="btn btn-success ml-1">Edit Parent <i _ngcontent-c2="" class="mdi mdi-plus"></i></button> -->
+                </div>
+
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Cell Number</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_phone_number" placeholder="Phone Number" [(ngModel)]="stud_phone_number">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">B-Form Number</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_bform_number" placeholder="Student B-Form Number" [(ngModel)]="stud_bform_number">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0.5em;">Emergency Number </label>
+
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="stud_emergency_number" placeholder="Student Emergency Number" [(ngModel)]="stud_emergency_number">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0.5em;">Email Address</label>
+
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_email" placeholder="Email" [(ngModel)]="stud_email">
+                </div>
+
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Address 1</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_address_1" placeholder="Student Address 1" [(ngModel)]="stud_address_1">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Address 2</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_address_2" placeholder="Student Address 2" [(ngModel)]="stud_address_2">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">School Previous Attended</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_prevSchool" placeholder="Previous Scool Name" [(ngModel)]="stud_prevSchool">
+                </div>
+
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Previous School Leaving Reason</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="stud_leavingReason" placeholder="Previous School Leaving Reason" [(ngModel)]="stud_leavingReason">
+                </div>
+
+
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Is Transport?</label>
+                    <span style="color:red; margin-left: 1.5em;"><small></small></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" name="std_transport" [(ngModel)]="std_transport">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Student Will Stay in Hostel?</label>
+                    <span style="color:red; margin-left: 1.5em;"><small></small></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" name="std_hostel" [(ngModel)]="std_hostel">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Student Blood Group</label>
+                    <span style="color:red; margin-left: 1.5em;"></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" name="std_bloodgroup" [(ngModel)]="std_bloodgroup">
+                        <option [ngValue]="undefined" disabled>Select</option>
+                        <option *ngFor="let item of bloodGroupList" [value]="item.value" >{{item.name}}</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Image</label> <span *ngIf="!imgValidation" style="color:red;margin-left: 1em;"> <small> Invalid Image Type </small> </span>
+                    <input id="student_image" style="margin-top:0em;" #imageFile accept="image/*" name="stud_image" type="file" (change)="fileChangeEvent($event)" class="form-control fm-control" placeholder="Upload a picture..." />
+                </div>
+
+
+
+                <div class="col-md-2 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Any Medical Problem</label>
+                    <span style="color:red; margin-left: 1.5em;"><small></small></span>
+                    <select [(ngModel)]="medical_problemOptionText" #medical_problemOption="ngModel" class="form-control fm-control" style="margin-top:0em;" name="medical_problem">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">If Yes What Kind of Medical Problem</label>
+                    <input [disabled]="medical_problemOption.value == 'No'" type="text" style="margin-top:0em;" class="form-control fm-control" name="student_medicalproblem" placeholder="" [(ngModel)]="student_medicalproblem">
+                </div>
+
+                <div class="col-md-2 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Have  Any Medical Handicap</label>
+                    <span style="color:red; margin-left: 1.5em;"><small></small></span>
+                    <select [(ngModel)]="handiCapOptionText" #handiCapOption="ngModel" class="form-control fm-control" style="margin-top:0em;" name="medical_handicap">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">If Yes What Kind of Disability</label>
+                    <input [disabled]="handiCapOption.value == 'No'" type="text" style="margin-top:0em;" class="form-control fm-control" name="student_disablityproblem" placeholder="" [(ngModel)]="student_disablityproblem">
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-12 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Other</label>
+                    <textarea style="margin-top:0em;" class="form-control fm-control" name="student_comment" [(ngModel)]="student_comment"></textarea>
+
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Admission Class *</label>
+                    <span style="color:red; margin-left: 1.5em;" *ngIf="!pickedStdCLassI.valid && pickedStdCLassI.touched"><small>Class
+                Required</small></span>
+                    <select required="" class="form-control fm-control" style="margin-top:0em;" #pickedStdCLassI [(ngModel)]="stud_classId" (change)=classSelected(pickedStdCLassI.value); name="stud_classId">
+              <option [ngValue]="undefined" disabled>Select Class</option>
+              <option *ngFor="let item of classDataList" [value]="item.class_id">{{item.class_name}}</option>
+            </select>
+
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Admission Section *</label>
+                    <span style="color:red; margin-left: .5em;" *ngIf="!pickedStdSectionI.valid && pickedStdSectionI.touched"><small>Section
+                Required</small></span>
+                    <select required="" class="form-control fm-control" style="margin-top:0em;" #pickedStdSectionI [(ngModel)]="stud_sectionId" (change)=enableBtn() name="stud_sectionId">
+              <option [ngValue]="undefined" disabled>Select Section</option>
+              <option *ngFor="let item of sectionsDataList" [value]="item.section_id">{{item.section_name}}</option>
+            </select>
+                </div>
+				
+				<div class="col-md-3 form-group" *ngIf="is_subject_group_allow">
+                   <label class="control-label" style="margin-top:.5em;"> Subject Group</label>
+					<span style="color:red; margin-left: .5em;" *ngIf="!pickedHead.valid && pickedHead.touched"><small>Subject Group Required</small></span>
+					<select class="form-control fm-control" style="margin-top:0em;" #pickedHead [(ngModel)]="sub_class_id" name="sub_class_id">
+						<option [ngValue]="undefined" >Default Subject Group</option>
+						<option *ngFor="let item of subClassData" [value]="item.sub_class_id">{{item.sub_class_name}}</option>
+					</select>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-info" [disabled]="!addstudent.form.valid || disableBtn" value="Add Student">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </form>
+</ng-template>
+
+
+<!-- ********student Data Update  Model ************ -->
+
+
+<ng-template #updateStudentModal let-modal>
+    <div class="modal-header">
+        <div style="text-align: center">
+            <h3>Update Student Information</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <form class="form-group" #updateStudent="ngForm" (ngSubmit)="onSubmitupdateStd(updateStudent)">
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Student Name *</label>
+                    <span style="color:red;  margin-left: 1em;" *ngIf="!pickedStdName.valid && pickedStdName.touched"><small>
+                Student Name Required</small> </span>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_name" placeholder="Student Name" required [(ngModel)]="std_name" #pickedStdName="ngModel">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Date Of Birth *</label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdDOB.valid && pickedStdDOB.touched"><small>DOB
+                Required</small></span>
+                    <input type="date" style="margin-top:0em;" class="form-control fm-control" name="std_dob" required [(ngModel)]="std_dob" #pickedStdDOB="ngModel">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Gender *</label>
+                    <span style="color:red; margin-left: 0em;" *ngIf="!pickedStdGender.valid && pickedStdGender.touched"><small>Gender
+                Required</small></span>
+                    <select class="form-control fm-control" required style="margin-top:0em;" [(ngModel)]="std_gender" name="std_gender" #pickedStdGender="ngModel">
+              <option [ngValue]="undefined" disabled>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Religion</label>
+
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_religion" placeholder="Religion" [(ngModel)]="std_religion">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Cell Number</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="std_phonenum" placeholder="Phone Number" [(ngModel)]="std_phonenum">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">B-Form Number</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_bform_number" placeholder="Student B-Form Number" [(ngModel)]="std_bform_number">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0.5em;">Emergency Number </label>
+
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="std_emergency_number" placeholder="Student Emergency Number" [(ngModel)]="std_emergency_number">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Email Address</label>
+
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_email" placeholder="Student Email" [(ngModel)]="std_email">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Address 1</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_address_1" placeholder="Student Address 1" [(ngModel)]="std_address_1">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Address 2</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_address_2" placeholder="Student Address 2" [(ngModel)]="std_address_2">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Previous School Name</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_prevSchool" placeholder="Previous Scool Name" [(ngModel)]="std_prevSchool">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Previous School Leaving Reason</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="std_leavingReason" placeholder="Previous School Leaving Reason" [(ngModel)]="std_leavingReason">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Is Transport?</label>
+                    <span style="color:red; margin-left: .5em;"><small></small></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" name="std_transport" [(ngModel)]="std_transport">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Student Will Stay in Hostel?</label>
+                    <span style="color:red; margin-left: .5em;"><small></small></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" name="std_hostel" [(ngModel)]="std_hostel">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Student Blood Group</label>
+                    <span style="color:red; margin-left: .5em;"></span>
+                    <select class="form-control fm-control" style="margin-top:0em;" name="std_blood_group" [(ngModel)]="std_blood_group">
+                        <option [ngValue]="undefined" disabled>Select</option>
+                        <option *ngFor="let item of bloodGroupList" [value]="item.value" >{{item.name}}</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0.5em;">Image</label> <span *ngIf="!imgValidation" style="color:red;margin-left: 1em;"> <small> Invalid Image Type </small> </span>
+                    <input id="student_image" style="margin-top:0em;" #imageFile accept="image/*" name="student_image" type="file" (change)="fileChangeEvent($event)" class="form-control fm-control" placeholder="Upload a picture..." />
+                    <a *ngIf="avatarImgSrc!='' && avatarImgSrc!=null" style="cursor: pointer;color:blue;font-size: 0.9rem;text-decoration: underline;" (click)="openNgImageModal(ViewImageModal,avatarImgSrc)">view</a>
+                </div>
+
+                <div class="col-md-2 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Any Medical Problem</label>
+                    <span style="color:red; margin-left: 1.5em;"><small></small></span>
+                    <select [(ngModel)]="medical_problemOptionText" #medical_problemOption="ngModel" class="form-control fm-control" style="margin-top:0em;" name="medical_problem">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">If Yes What Kind of Medical Problem</label>
+                    <input [disabled]="medical_problemOption.value == 'No'" type="text" style="margin-top:0em;" class="form-control fm-control" name="student_medicalproblem" placeholder="" [(ngModel)]="student_medicalproblem">
+                </div>
+
+                <div class="col-md-2 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Have  Any Medical Handicap</label>
+                    <span style="color:red; margin-left: 1.5em;"><small></small></span>
+                    <select [(ngModel)]="handiCapOptionText" #handiCapOption="ngModel" class="form-control fm-control" style="margin-top:0em;" name="medical_handicap">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">If Yes What Kind of Disability</label>
+                    <input [disabled]="handiCapOption.value == 'No'" type="text" style="margin-top:0em;" class="form-control fm-control" name="student_disablityproblem" placeholder="" [(ngModel)]="student_disablityproblem">
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-12 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Other</label>
+                    <textarea style="margin-top:0em;" class="form-control fm-control" name="student_comment" [(ngModel)]="student_comment"></textarea>
+                </div>
+       
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0em;">Class *</label>
+                    <input type="text" style="margin-top:0em;" [disabled]=true class="form-control fm-control" name="class_name" placeholder="Student Address" [(ngModel)]="class_name">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label"> Section *</label>
+                    <input type="text" style="margin-top:0em;" [disabled]=true class="form-control fm-control" name="section_name" [(ngModel)]="section_name">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label"> Subject Group</label>
+                    <input type="text" style="margin-top:0em;" [disabled]=true class="form-control fm-control" name="sub_class_name" [(ngModel)]="sub_class_name">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label class="control-label" style="margin-top:0em;">Roll Number *</label>
+                    <span style="color:red; margin-left: 1em;" *ngIf="!pickedStdRollnum.valid && pickedStdRollnum.touched"><small>Roll
+                Num Required</small></span>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" placeholder="Student Roll Number" [(ngModel)]="std_rollNum" [disabled]="true" required name="std_rollNum" #pickedStdRollnum="ngModel">
+
+                    <input type="hidden" [(ngModel)]="std_id" name="std_id">
+                    <input type="hidden" [(ngModel)]="enroll_id" name="enroll_id">
+                    <input type="hidden" [(ngModel)]="class_id" name="class_id">
+                </div>
+
+
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-info" [disabled]="!updateStudent.form.valid" value="Update Student">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </form>
+</ng-template>
+
+
+<!-- add parent modal  -->
+
+
+<ng-template #AddParentModal let-modal>
+    <div class="modal-header">
+        <div style="text-align: center; width:100%;">
+            <h3>{{ add_or_edit_parent_mode =='add' ? 'Add parent details' : 'Update parent details'  }}</h3>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <form class="form-group" #addparent="ngForm" (ngSubmit)="add_or_edit_parent_mode=='add' ? onSubmitAddParent(addparent) : onSubmitUpdateParent(addparent)">
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-2 form-group">
+                    <label class="control-label"> <b>Select Guardian:</b></label>
+                </div>
+                <div class="col-md-2 form-group" style="margin-left:-5em;">
+
+                    <select (change)="onChangeFatherMotherGuardian(fatherMotherGuardian.value)" [(ngModel)]="fatherMotherGuardianText" #fatherMotherGuardian="ngModel" class="form-control fm-control" required style="margin-top:0em;" name="parentMotherGuardian">
+                        <option  *ngFor="let item of optionList"  [value]="item.value">{{item.name}}</option>
+                       
+                    </select>
+
+                </div>
+            </div>
+            <hr style="height: 1px; background-color:#ccc; border:none;">
+            <h4 [ngStyle]='FatherStyle'>Father's Details
+                <font color="red" style="margin-left: -5px;" *ngIf="fatherMotherGuardian.value == 'father'">*</font>
+            </h4>
+
+
+            <div class="row">
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Father Name * <span style="color:red;"
+              *ngIf="fatherMotherGuardian.value == 'father' && !pickedPname.valid && pickedPname.touched" ><small>
+                Father Name Required</small> </span></label>
+                    <input required="" type="text" style="margin-top:0em;" class="form-control fm-control" name="parent_name" placeholder="Father Name" [(ngModel)]="parent_name" #pickedPname="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Father CNIC <span *ngIf="parent_type=='father'">*</span> <span style="color:red;"
+              *ngIf="fatherMotherGuardian.value == 'father' && !pickedCNIC.valid && pickedCNIC.touched"><small>
+                Invalid CNIC Number</small> </span></label>
+                    <span style="color:red;" *ngIf="cnic_check"><small style="margin-left: 1em;"> CNIC is
+              already in use</small></span>
+                    <input [required]="parent_type=='father'" [pattern]="nicNumberPattern"  type="number" style="margin-top:0em;" (keyup)="check_cnicUniqueF(this.parent_cnic)" class="form-control fm-control" name="parent_cnic" placeholder="71502145XXXXX" [(ngModel)]="parent_cnic" #pickedCNIC="ngModel">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Phone Number <span *ngIf="parent_type=='father'">*</span> <span style="color:red;"
+              *ngIf="fatherMotherGuardian.value == 'father' && !pickedPphoneNum.valid && pickedPphoneNum.touched"><small>
+                Father Phone Number Required</small>
+            </span></label>
+                    <span style="color:red;" *ngIf="phone_check"><small style="margin-left: 0em;"> Number is
+              already in use</small></span>
+                    <input [required]="parent_type=='father'" type="number" (keyup)="setUserName(this.parent_phoneNum,'father')" style="margin-top:0em;"  class="form-control fm-control" name="parent_phoneNum" placeholder="Father Phone Number" [(ngModel)]="parent_phoneNum" #pickedPphoneNum="ngModel">
+                </div>
+
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Occupation</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="parent_profession" placeholder="Father Occupation" [(ngModel)]="parent_profession">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Income</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="parent_income" placeholder="Father Income" [(ngModel)]="parent_income">
+                </div>
+
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Education</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="parent_education" placeholder="Father Education" [(ngModel)]="parent_education">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Work Phone</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="parent_sec_phoneNum" placeholder="Father Office Phone" [(ngModel)]="parent_sec_phoneNum">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Email</label>
+                    <span style="color:red;" *ngIf="email_check"><small style="margin-left: 1em;"> Email is
+              already in use</small></span>
+                    <input type="email" style="margin-top:0em;" class="form-control fm-control" name="parent_email" placeholder="Father Email" [(ngModel)]="parent_email" (keyup)=check_emailUniqueF(this.parent_email) #pickedPemail="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Father Address</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="parent_address" placeholder="Father Address" [(ngModel)]="parent_address">
+                </div>
+
+            </div>
+            
+            <hr style="height: 1px; background-color:#ccc; border:none;">
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> User Name *
+            <span style="color:red;" *ngIf="!pickedPuserName.valid && pickedPuserName.touched"><small>
+                User
+                Name Required</small> </span>
+            <span style="color:red;" *ngIf="checkUserName"><small style="margin-left: 1em;"> User Name is
+                already in use</small></span>
+          </label>
+                    <input type="text" readonly style="margin-top:0em;"  class="form-control fm-control" name="parent_userName" (keyup)=isUserNameAdded(this.parent_userName) placeholder="User Name" [(ngModel)]="parent_userName" #pickedPuserName="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Password <span *ngIf="add_or_edit_parent_mode=='add'">*</span> <span *ngIf="add_or_edit_parent_mode=='edit'">(Only if you want to change)</span> <span style="color:red;"
+              *ngIf="add_or_edit_parent_mode=='add' && !pickedPassword.valid && pickedPassword.touched"><small>Field
+                Required</small>
+            </span></label>
+                    <input type="text" style="margin-top:0em;"  class="form-control fm-control" name="parent_password" placeholder="password" [(ngModel)]="parent_password" #pickedPassword="ngModel">
+                </div>
+
+            </div>
+
+            <hr style="height: 1px; background-color:#ccc; border:none;">
+            <h4 [ngStyle]='MotherStyle'>Mother's Details
+                <!--to do need to separate underscore and * control  -->
+                <font color="red" style="margin-left: -5px;" *ngIf="fatherMotherGuardian.value == 'mother'">*</font>
+            </h4>
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Mother Name <span *ngIf="parent_type=='mother'">*</span>  <span style="color:red;"
+                    *ngIf="fatherMotherGuardian.value == 'mother' && !motherName.valid && motherName.touched"><small>
+                Mother Name Required</small></span></label>
+                    <input [required]="parent_type=='mother'" type="text"  style="margin-top:0em;" class="form-control fm-control" name="mother_name" placeholder="Mother Name" [(ngModel)]="mother_name" #motherName="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Mother CNIC <span *ngIf="parent_type=='mother'">*</span> <span style="color:red;"
+                        *ngIf="fatherMotherGuardian.value == 'mother' && !motherCNIC.valid && motherCNIC.touched">
+                        <small>Mother CNIC  Required</small>
+                    </span></label>
+
+                    <input [required]="parent_type=='mother'" [pattern]="nicNumberPattern" type="number"  style="margin-top:0em;" (keyup)="check_cnicUniqueF(this.mother_cnic)" class="form-control fm-control" name="mother_cnic" placeholder="71502145XXXXX" [(ngModel)]="mother_cnic" #motherCNIC="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mother Phone Number <span *ngIf="parent_type=='mother'">*</span> <span style="color:red;" *ngIf="fatherMotherGuardian.value == 'mother' && !pickedMphoneNum.valid && pickedMphoneNum.touched">
+            <small>Mother Phone Number Required</small></span></label>
+                    <span style="color:red;" *ngIf="phone_check"><small style="margin-left: 0em;"> Number is
+              already in use</small></span>
+                    <input [required]="parent_type=='mother'" type="number" (keyup)="setUserName(this.mother_phoneNum,'mother')" style="margin-top:0em;"  class="form-control fm-control" name="mother_phoneNum" placeholder="Mother Phone Number" [(ngModel)]="mother_phoneNum" #pickedMphoneNum="ngModel">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mother Occupation</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="mother_profession" placeholder="Mother Occupation" [(ngModel)]="mother_profession">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mother Income</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="mother_income" placeholder="Mother Income" [(ngModel)]="mother_income">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mother Education</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="mother_education" placeholder="Mother Education" [(ngModel)]="mother_education">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mother Work Phone</label>
+                    <input type="number" style="margin-top:0em;" class="form-control fm-control" name="mother_sec_phoneNum" placeholder="Mother Office Phone" [(ngModel)]="mother_sec_phoneNum">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Mother Email</label>
+                    <span style="color:red;" *ngIf="email_check"><small style="margin-left: 1em;"> Email is
+              already in use</small></span>
+                    <input type="email" style="margin-top:0em;" class="form-control fm-control" name="mother_email" placeholder="Mother Email" [(ngModel)]="mother_email" (keyup)=check_emailUniqueF(this.mother_email) #motherEmail="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Mother Address</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="mother_address" placeholder="Mother Address" [(ngModel)]="mother_address">
+                </div>
+            </div>
+
+            <hr style="height: 1px; background-color:#ccc; border:none;">
+            <h4 [ngStyle]='GuardianStyle'>Guardian Details
+                <font color="red" style="margin-left: -5px;" *ngIf="fatherMotherGuardian.value == 'guardian'">*</font>
+            </h4>
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Guardian Name <span *ngIf="parent_type=='guardian'">*</span> <span style="color:red;"
+              *ngIf="fatherMotherGuardian.value == 'guardian' && !guardianName.valid && guardianName.touched"><small>
+                Guardian Name Required</small> </span></label>
+                    <input [required]="parent_type=='guardian'" type="text"  style="margin-top:0em;" class="form-control fm-control" name="guardian_name" placeholder="Guardian Name" [(ngModel)]="guardian_name" #guardianName="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Guardian CNIC <span *ngIf="parent_type=='guardian'">*</span> <span style="color:red;"
+              *ngIf="fatherMotherGuardian.value == 'guardian' && !guardianCNIC.valid && guardianCNIC.touched"><small>
+                Invalid CNIC Number</small> </span></label>
+                    <span style="color:red;" *ngIf="cnic_check"><small style="margin-left: 1em;"> CNIC is
+              already in use</small></span>
+                    <input [required]="parent_type=='guardian'" [pattern]="nicNumberPattern" type="number"  style="margin-top:0em;" (keyup)="check_cnicUniqueF(this.guardian_cnic)" class="form-control fm-control" name="guardian_cnic" placeholder="71502145XXXXX" [(ngModel)]="guardian_cnic" #guardianCNIC="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Phone Number <span *ngIf="parent_type=='guardian'">*</span> <span style="color:red;"
+              *ngIf="fatherMotherGuardian.value == 'guardian' && !pickedGphoneNum.valid && pickedGphoneNum.touched"><small>
+                Phone Number Required</small>
+            </span></label>
+                    <span style="color:red;" *ngIf="phone_check"><small style="margin-left: 0em;"> Number is
+              already in use</small></span>
+                    <input [required]="parent_type=='guardian'" type="number" style="margin-top:0em;"  class="form-control fm-control" (keyup)="setUserName(this.guardian_phoneNum,'guardian')" name="guardian_phoneNum" placeholder="Guardian Phone Number" [(ngModel)]="guardian_phoneNum" #pickedGphoneNum="ngModel">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Relation</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="guardian_relation" placeholder="Guardian Relation" [(ngModel)]="guardian_relation">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Occupation</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="guardian_profession" placeholder="Guardian Occupation" [(ngModel)]="guardian_profession">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Income</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="guardian_income" placeholder="Guardian Income" [(ngModel)]="guardian_income">
+                </div>
+
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Education</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="guardian_education" placeholder="Guardian Education" [(ngModel)]="guardian_education">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Work Phone</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="guardian_sec_phoneNum" placeholder="Guardian Office Phone" [(ngModel)]="guardian_sec_phoneNum">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;"> Guardian Email</label>
+                    <span style="color:red;" *ngIf="email_check"><small style="margin-left: 1em;"> Email is
+              already in use</small></span>
+                    <input type="email" style="margin-top:0em;" class="form-control fm-control" name="guardian_email" placeholder=" Guardian Email" [(ngModel)]="guardian_email" (keyup)=check_emailUniqueF(this.guardian_email) #gaurdianEmail="ngModel">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="control-label" style="margin-top:.5em;">Guardian Address</label>
+                    <input type="text" style="margin-top:0em;" class="form-control fm-control" name="guardian_address" placeholder="Guardian Address" [(ngModel)]="guardian_address">
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-info" [disabled]="!addparent.form.valid || checkUserName || !checkCnic || !checkPhone" value="{{ add_or_edit_parent_mode =='add' ? 'Add Parent' : 'Update Parent'  }}">
+            <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #ViewImageModal let-modal>
+    <div class="modal-header">
+      <div style="text-align: center">
+        <h4>Profile Image</h4>
+      </div>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+      
+    <div class="modal-body p-1">
+  
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <img [src]="avatarImgSrc == '' && avatarImgSrc==null ?  placeholderPath : avatarImgSrc" style="max-width:20rem;">
+            </div>
+        </div>
+  
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+  
+  </ng-template>

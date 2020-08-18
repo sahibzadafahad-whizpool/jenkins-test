@@ -1,0 +1,295 @@
+<div class="row">
+
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+
+
+
+        <div class="row">
+
+          <div class="col-lg-9 col-md-9">
+			<h4 class="card-title text-center">
+				Subject Details
+			</h4>
+          </div>
+
+          <div class="col-lg-3  " style="padding-bottom: 1.5em;">
+
+            <button _ngcontent-c2="" (click)="openNgModal(addSubjectModal , 'md')" class="btn btn-success btn-block">New
+              Subject
+              <i _ngcontent-c2="" class="mdi mdi-plus"></i></button>
+          </div>
+        </div>
+
+
+        <div class="table-responsive">
+
+          <div class="row">
+            <div class="col-lg-3">
+              <div class="list-group" style="padding-top: 0px; width: -webkit-fill-available;">
+
+                <p class="list-group-item mini-sidebar">
+                  <i class="fa fa-university"></i>
+                  <span> Select Class</span>
+                </p>
+                <a *ngFor="let item of classData " class="list-group-item" style="cursor: pointer;" class="list-group-item" [style.background-color]="item.BackgroundColour" [style.color]="item.color"  (click)="onClickSideBar(item.class_id , item)">
+                  <span>{{item.class_name}}</span>
+                </a>
+              </div>
+
+            </div>
+            <div class="col-lg-9 grid-margin ">
+
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title text-center">
+					{{selectedClassName}} {{notAvailable}}
+				   </h4>
+
+                  <ngb-tabset class="tab-solid tab-solid-primary">
+                    <ngb-tab>
+                      <ng-template ngbTabTitle>
+                        Core Subjects
+                      </ng-template>
+                      <ng-template ngbTabContent>
+                        <table class="table table-bordered table-hover">
+                          <thead class="thead-light">
+                            <tr>
+
+                              <th>Section </th>
+                              <th>Subject </th>
+                              <th>Teacher </th>
+                              <th *ngIf="(admin_level == 1)">Actions</th>
+
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="let item of coreSubjectsData | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+
+                              <td>{{item.section_name}}</td>
+                              <td>{{item.subject_name}}</td>
+
+                              <td>{{item.teacher_name}}</td>
+                              <td *ngIf="(admin_level == 1)">
+
+                                <label class="badge badge-info"
+                                  (click)=openEditSubjectModal(updateSubjectModal,item.subject_id,item.section_id,item.class_id)
+                                  style="cursor: pointer;">Edit</label>
+                                <label class="badge badge-danger"
+                                  (click)=deleteSubject(item.class_id,item.section_id,item.subject_id)
+                                  style="cursor: pointer; margin-left: 1em;">Delete
+                                </label>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </ng-template>
+                    </ngb-tab>
+                    <ngb-tab>
+                      <ng-template ngbTabTitle>
+                        Elective Subjects
+                      </ng-template>
+                      <ng-template ngbTabContent>
+                        <table class="table table-bordered table-hover">
+                          <thead class="thead-light">
+                            <tr>
+                              <th>Class</th>
+                              <th>Section</th>
+                              <th>Subject</th>
+                              <th>Teacher</th>
+                              <th>Actions</th>
+
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="let item of electiveSubjectsData | paginate: { id: 'pager', itemsPerPage: pageSize, currentPage: pageNumber};let index = index">
+                              <td>{{item.class_name}}</td>
+                              <td>{{item.section_name}}</td>
+                              <td>{{item.subject_name}}</td>
+
+                              <td>{{item.teacher_name}}</td>
+                              <td>
+
+
+                                <label class="badge badge-info"
+                                  (click)=openEditSubjectModal(updateSubjectModal,item.subject_id,item.section_id,item.class_id)
+                                  style="cursor: pointer;">Edit</label>
+                                <label class="badge badge-danger"
+                                  (click)=deleteSubject(item.class_id,item.section_id,item.subject_id)
+                                  style="cursor: pointer; margin-left: 1em;">Delete
+                                </label>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </ng-template>
+                    </ngb-tab>
+
+                  </ngb-tabset>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+          <div style="text-align: center ; margin-top: 2em;">
+            <form class="pagination-wrapper">
+              <div class="form-group pages">
+                <pagination-controls class="my-pagination" id="pager" (pageChange)="pageChanged($event)" maxSize="10"
+                  directionLinks="true" autoHide="true" previousLabel="Prev" nextLabel="Next"
+                  screenReaderPaginationLabel="Pagination" screenReaderPageLabel="page"
+                  screenReaderCurrentLabel="You're on page">
+                </pagination-controls>
+              </div>
+
+            </form>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- add Subject modal  -->
+
+
+<ng-template #addSubjectModal let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Add New</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+   <form class="form-group" #addSubject="ngForm" (ngSubmit)="onSubmitAddSubj(addSubject)">
+  <div class="modal-body">
+
+      <div class="row">
+
+        <div class="col-lg-6 form-group">
+          <label class="control-label"> Select Class *</label>
+          <select class="form-control fm-control" required style="margin-top:0em;" #selectedClass [(ngModel)]="class_id"
+            (change)=classSelected(selectedClass.value); name="class_id">
+            <option [ngValue]="undefined" disabled>Select Class </option>
+            <option *ngFor="let item of classData" [value]="item.class_id">{{item.class_name}}</option>
+          </select>
+
+        </div>
+        <div class="col-lg-6 form-group">
+          <label class="control-label">Section *</label>
+          <select class="form-control fm-control" required style="margin-top:0em;" [(ngModel)]="section_id"
+            #selectedSection (change)=sectionSelected(selectedSection.value); name="section_id">
+            <option [ngValue]="undefined" disabled>Select Section</option>
+            <option *ngFor="let item of sectionData" [value]="item.section_id">{{item.section_name}}</option>
+          </select>
+        </div>
+        <div class="col-lg-6 form-group">
+          <label class="control-label">Teacher</label>
+          <select class="form-control fm-control" style="margin-top:0em;" [(ngModel)]="teacher_id" name="teacher_id">
+            <option [ngValue]="undefined" disabled>Select Teacher </option>
+            <option *ngFor="let item of teachersData" [value]="item.employee_id">{{item.employee_name}}</option>
+          </select>
+
+        </div>
+        <div class="col-lg-6 form-group">
+
+          <label class="control-label">Subject Name *</label>
+          <span style="color:red;" *ngIf="subjectCheckAlert"><small style="margin-left: 1em;"> Subject already
+              registred against class.</small> </span>
+          <input type="text" style="margin-top:0em;" required class="form-control fm-control" name="subject_name"
+            #subjName (change)="checkSubject(subjName.value)" placeholder="Subject Name" ngModel>
+        </div>
+        <div class="col-lg-6 form-group">
+          <label class="control-label">Subject Type *</label>
+          <select class="form-control fm-control" required style="margin-top:0em;" [(ngModel)]="subject_type"
+            name="subject_type">
+            <option [ngValue]="undefined" disabled>Select Type </option>
+            <option [value]="1">Core</option>
+            <option [value]="2">Elective</option>
+          </select>
+        </div>
+
+
+      </div>
+
+
+  </div>
+  <div class="modal-footer">
+   <input type="submit" class="btn btn-info"
+            [disabled]="!addSubject.form.valid || disableBtn" value="Add Subject">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+     </form>
+</ng-template>
+
+
+
+
+
+<!-- Update Subject  -->
+
+<ng-template #updateSubjectModal let-modal>
+  <div class="modal-header">
+    <div style="text-align: center">
+      <h3>Update Subject Details</h3>
+    </div>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form class="form-group" #updateSubject="ngForm" (ngSubmit)="onSubmitUpdateSubj(updateSubject)">
+  <div class="modal-body">
+
+      <div class="row">
+        <div class="col-lg-12 form-group">
+          <label class="control-label"> Class </label>
+          <input type="text" [disabled]="true" class="form-control fm-control" name="className" [(ngModel)]="className">
+        </div>
+        <div class="col-lg-12 form-group">
+          <label class="control-label">Section </label>
+          <input type="text" [disabled]="true" class="form-control fm-control" name="sectionName"
+            [(ngModel)]="sectionName">
+        </div>
+        <div class="col-lg-12 form-group">
+          <label class="control-label">Teacher</label>
+          <select class="form-control fm-control" [(ngModel)]="teacherId" name="teacherId">
+            <option [ngValue]="undefined" disabled>Select</option>
+            <option *ngFor="let item of teachersData" [value]="item.employee_id">{{item.employee_name}}</option>
+          </select>
+        </div>
+        <div class="col-lg-12 form-group">
+          <label class="control-label">Subject Name *</label>
+          <input type="text" class="form-control fm-control" required name="subjectName" [(ngModel)]="subjectName">
+        </div>
+        <div class="col-lg-12 form-group">
+          <label class="control-label">Subject Type *</label>
+          <select class="form-control fm-control" required [(ngModel)]="subjectType"
+            name="subjectType">
+
+            <option [value]="1">Core</option>
+            <option [value]="2">Elective</option>
+          </select>
+        </div>
+        <input type="hidden" name="classId" [(ngModel)]="classId">
+        <input type="hidden" name="sectionId" [(ngModel)]="sectionId">
+        <input type="hidden" name="subjectId" [(ngModel)]="subjectId">
+
+      </div>
+
+
+  </div>
+  <div class="modal-footer">
+  <input type="submit" class="btn btn-info" [disabled]="!updateSubject.form.valid  " value="Update Subject">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+    </form>
+</ng-template>
