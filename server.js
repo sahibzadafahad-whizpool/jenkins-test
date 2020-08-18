@@ -27,6 +27,9 @@ app.use(function(req, res, next) {
 //define port
 const port = 8080;
 
+const test = 'test message';
+
+
 //adding middleware -cors
 app.use(cors());
 
